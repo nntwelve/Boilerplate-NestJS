@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   flash_cards_api_dev:
@@ -7,13 +7,11 @@ services:
     build:
       context: .
       target: development
-    command: npm run start:dev
-    env_file:
-      - './.env.dev'
     ports:
-      - ${PORT}
+      - ${PORT}:${PORT}
     volumes:
       - ./:/usr/src/app
+    command: npm run start:dev
     restart: unless-stopped
 
 networks:
