@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  flash_cards_api_dev:
+    container_name: flash_cards_api_dev
+    image: flash_cards_api_dev:1.0.0
+    build:
+      context: .
+      target: development
+    command: npm run start:dev
+    env_file:
+      - './.env.dev'
+    ports:
+      - ${PORT}
+    volumes:
+      - ./:/usr/src/app
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
