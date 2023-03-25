@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -27,6 +28,13 @@ import { database_config } from './configs/configuration.config';
 			cache: true,
 			expandVariables: true,
 			envFilePath: process.env.NODE_ENV === 'development' ? '.env.dev' : '.env',
+		}),
+		MongooseModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => ({
+				uri: configService.get<string>('DATABASE_URI'),
+			}),
+			inject: [ConfigService],
 		}),
 	],
 	controllers: [AppController],

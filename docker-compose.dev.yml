@@ -9,9 +9,23 @@ services:
       target: development
     ports:
       - ${PORT}:${PORT}
+    depends_on:
+      - flash_cards_mongodb # Đảm bảo mongoDB đã start thành công mới chạy container api
     volumes:
       - ./:/usr/src/app
     command: npm run start:dev
+    restart: unless-stopped
+
+  flash_cards_mongodb:
+    container_name: ${DATABASE_HOST}
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME} # Lưu ý 2 biến này từ file env
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD} # và dùng --env-file để đọc từ .env.dev
+    expose:
+      - ${DATABASE_PORT}
+    volumes:
+      - ./mongo-data:/data/db
     restart: unless-stopped
 
 networks:
