@@ -3,7 +3,7 @@ export interface BaseRepositoryInterface<T> {
 
 	findOneById(id: string): Promise<T>;
 
-	findOneByCondition(condition: {}): Promise<T>;
+	findOneByCondition(condition: object): Promise<T>;
 
 	findAll(): Promise<T[]>;
 

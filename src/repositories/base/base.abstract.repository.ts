@@ -17,7 +17,7 @@ export abstract class BaseRepositoryAbstract<T>
 		return await this.model.findById(id).exec();
 	}
 
-	async findOneByCondition(condition: {}): Promise<T> {
+	async findOneByCondition(condition: object): Promise<T> {
 		return await this.model.findOne(condition).exec();
 	}
 
