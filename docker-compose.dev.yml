@@ -28,6 +28,19 @@ services:
       - ./mongo-data:/data/db
     restart: unless-stopped
 
+  flash_cards_mongo_express:
+    container_name: flash_cards_mongo_express
+    image: mongo-express:latest
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DATABASE_USERNAME} # 2 biến này dùng làm basic
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DATABASE_PASSWORD} # auth khi truy cập mongo_express
+      ME_CONFIG_MONGODB_URL: ${DATABASE_URI}?authSource=admin # Đây là thông tin kết nối tới database
+    ports:
+      - 8002:8081
+    depends_on:
+      - flash_cards_mongodb
+    restart: unless-stopped
+
 networks:
   default:
     driver: bridge

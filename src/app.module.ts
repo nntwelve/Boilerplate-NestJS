@@ -4,8 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { database_config } from './configs/configuration.config';
-
+import { database_config } from '@configs/configuration.config';
+import { UsersModule } from '@modules/users/users.module';
+import { FlashCardsModule } from '@modules/flash-cards/flash-cards.module';
+import { CollectionsModule } from '@modules/collections/collections.module';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -33,9 +35,13 @@ import { database_config } from './configs/configuration.config';
 			imports: [ConfigModule],
 			useFactory: async (configService: ConfigService) => ({
 				uri: configService.get<string>('DATABASE_URI'),
+				dbName: configService.get<string>('DATABASE_NAME'),
 			}),
 			inject: [ConfigService],
 		}),
+		UsersModule,
+		FlashCardsModule,
+		CollectionsModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
