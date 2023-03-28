@@ -1,4 +1,3 @@
-import { UsersService } from '@modules/users/users.service';
 import { Injectable } from '@nestjs/common';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
 import { UpdateFlashCardDto } from './dto/update-flash-card.dto';
