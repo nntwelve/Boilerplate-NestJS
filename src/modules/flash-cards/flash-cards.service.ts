@@ -1,14 +1,18 @@
+import { UsersService } from '@modules/users/users.service';
 import { Injectable } from '@nestjs/common';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
 import { UpdateFlashCardDto } from './dto/update-flash-card.dto';
 
 @Injectable()
 export class FlashCardsService {
+	/**
+	 *
+	 */
 	create(createFlashCardDto: CreateFlashCardDto) {
 		return 'This action adds a new flashCard';
 	}
 
-	findAll() {
+	async findAll() {
 		return `This action returns all flashCards`;
 	}
 
