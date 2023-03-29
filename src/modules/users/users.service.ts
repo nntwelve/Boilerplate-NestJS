@@ -10,7 +10,6 @@ export class UsersService {
 		private readonly users_repository: UserRepositoryInterface,
 	) {}
 	async create(create_user_dto: CreateUserDto) {
-		console.log(create_user_dto);
 		return await this.users_repository.create(create_user_dto);
 	}
 

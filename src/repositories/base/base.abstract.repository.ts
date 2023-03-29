@@ -1,4 +1,10 @@
-import { Model } from 'mongoose';
+import { AnyObject, Model } from 'mongoose';
+import {
+	FindAllResponse,
+	PaginateParams,
+	SortParams,
+	SORT_TYPE,
+} from 'src/types/common.type';
 import { BaseRepositoryInterface } from './base.interface.repository';
 
 export abstract class BaseRepositoryAbstract<T>
@@ -14,19 +20,49 @@ export abstract class BaseRepositoryAbstract<T>
 	}
 
 	async findOneById(id: string): Promise<T> {
-		return await this.model.findById(id).exec();
+		return await this.model
+			.findOne({
+				deleted_at: null,
+				_id: id,
+			})
+			.exec();
 	}
 
-	async findOneByCondition(condition: object): Promise<T> {
-		return await this.model.findOne(condition).exec();
+	async findOneByCondition(condition = {}): Promise<T> {
+		return await this.model
+			.findOne({
+				...condition,
+				deleted_at: null,
+			})
+			.exec();
 	}
 
-	async findAll(): Promise<T[]> {
-		return await this.model.find();
+	async findAll(
+		condition = {},
+		projection?: string,
+		options?: SortParams & PaginateParams & AnyObject,
+	): Promise<FindAllResponse<T>> {
+		const [count, items] = await Promise.all([
+			this.model.count({ ...condition, deleted_at: null }),
+			this.model.find({ ...condition, deleted_at: null }, projection, {
+				limit: options?.limit ?? 20,
+				skip: options?.offset ?? 0,
+				sort: options?.sort_by
+					? { [options?.sort_by]: options?.sort_type }
+					: {},
+			}),
+		]);
+		return {
+			count,
+			items,
+		};
 	}
 
 	async update(id: string, dto: Partial<T>): Promise<T> {
-		return await this.model.findByIdAndUpdate(id, dto, { new: true }).exec();
+		await this.model
+			.updateOne({ _id: id, deleted_at: null }, dto, { new: true })
+			.exec();
+		return await this.model.findById(id).exec();
 	}
 
 	async softDelete(id: string): Promise<boolean> {
