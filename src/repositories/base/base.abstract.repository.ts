@@ -3,7 +3,6 @@ import {
 	FindAllResponse,
 	PaginateParams,
 	SortParams,
-	SORT_TYPE,
 } from 'src/types/common.type';
 import { BaseRepositoryInterface } from './base.interface.repository';
 

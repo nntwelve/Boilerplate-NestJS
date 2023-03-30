@@ -1,6 +1,7 @@
 import { BaseEntity } from '@modules/shared/base/base.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { Address, AddressSchema } from './address.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -76,6 +77,11 @@ export class User extends BaseEntity {
 
 	@Prop()
 	headline: string;
+
+	@Prop({
+		type: AddressSchema,
+	})
+	address: Address;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
