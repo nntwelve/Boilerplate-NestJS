@@ -22,7 +22,7 @@ export class UpdateUserDto extends PartialType(
 
 	@IsOptional()
 	@IsEnum(GENDER)
-	gender?: string;
+	gender?: GENDER;
 
 	@IsOptional()
 	@MaxLength(200)

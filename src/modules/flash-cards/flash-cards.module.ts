@@ -3,6 +3,7 @@ import { FlashCardsService } from './flash-cards.service';
 import { FlashCardsController } from './flash-cards.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FlashCard, FlashCardSchema } from './entities/flash-card.entity';
+import { FlashCardsRepository } from '@repositories/flash-cards.repository';
 
 @Module({
 	imports: [
@@ -11,6 +12,12 @@ import { FlashCard, FlashCardSchema } from './entities/flash-card.entity';
 		]),
 	],
 	controllers: [FlashCardsController],
-	providers: [FlashCardsService],
+	providers: [
+		FlashCardsService,
+		{
+			provide: 'FlashCardsRepositoryInterface',
+			useClass: FlashCardsRepository,
+		},
+	],
 })
 export class FlashCardsModule {}

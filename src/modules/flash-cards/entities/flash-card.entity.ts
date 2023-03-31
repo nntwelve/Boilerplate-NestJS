@@ -3,7 +3,9 @@ import { User } from '@modules/users/entities/user.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-@Schema()
+@Schema({
+	collection: 'flash-cards',
+})
 export class FlashCard extends BaseEntity {
 	@Prop({ required: true })
 	vocabulary: string;

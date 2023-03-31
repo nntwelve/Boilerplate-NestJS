@@ -64,7 +64,7 @@ export class User extends BaseEntity {
 	@Prop({
 		enum: GENDER,
 	})
-	gender: string;
+	gender: GENDER;
 
 	@Prop({ default: 0 })
 	point: number;
@@ -73,7 +73,7 @@ export class User extends BaseEntity {
 		default: USER_ROLE.User,
 		enum: USER_ROLE,
 	})
-	role: string;
+	role: USER_ROLE;
 
 	@Prop()
 	headline: string;

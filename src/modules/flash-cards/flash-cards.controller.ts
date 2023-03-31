@@ -13,33 +13,33 @@ import { UpdateFlashCardDto } from './dto/update-flash-card.dto';
 
 @Controller('flash-cards')
 export class FlashCardsController {
-	constructor(private readonly flashCardsService: FlashCardsService) {}
+	constructor(private readonly flash_cards_service: FlashCardsService) {}
 
 	@Post()
-	create(@Body() createFlashCardDto: CreateFlashCardDto) {
-		return this.flashCardsService.create(createFlashCardDto);
+	create(@Body() create_flash_card_dto: CreateFlashCardDto) {
+		return this.flash_cards_service.create(create_flash_card_dto);
 	}
 
 	@Get()
 	findAll() {
-		return this.flashCardsService.findAll();
+		return this.flash_cards_service.findAll();
 	}
 
 	@Get(':id')
 	findOne(@Param('id') id: string) {
-		return this.flashCardsService.findOne(+id);
+		return this.flash_cards_service.findOne(id);
 	}
 
 	@Patch(':id')
 	update(
 		@Param('id') id: string,
-		@Body() updateFlashCardDto: UpdateFlashCardDto,
+		@Body() update_flash_card_dto: UpdateFlashCardDto,
 	) {
-		return this.flashCardsService.update(+id, updateFlashCardDto);
+		return this.flash_cards_service.update(id, update_flash_card_dto);
 	}
 
 	@Delete(':id')
 	remove(@Param('id') id: string) {
-		return this.flashCardsService.remove(+id);
+		return this.flash_cards_service.remove(id);
 	}
 }

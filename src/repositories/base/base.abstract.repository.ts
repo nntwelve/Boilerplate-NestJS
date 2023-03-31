@@ -1,12 +1,9 @@
-import { AnyObject, Model } from 'mongoose';
-import {
-	FindAllResponse,
-	PaginateParams,
-	SortParams,
-} from 'src/types/common.type';
+import { BaseEntity } from '@modules/shared/base/base.entity';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { FindAllResponse } from 'src/types/common.type';
 import { BaseRepositoryInterface } from './base.interface.repository';
 
-export abstract class BaseRepositoryAbstract<T>
+export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 	implements BaseRepositoryInterface<T>
 {
 	protected constructor(private readonly model: Model<T>) {
@@ -19,12 +16,8 @@ export abstract class BaseRepositoryAbstract<T>
 	}
 
 	async findOneById(id: string): Promise<T> {
-		return await this.model
-			.findOne({
-				deleted_at: null,
-				_id: id,
-			})
-			.exec();
+		const item = await this.model.findById(id);
+		return item.deleted_at ? null : item;
 	}
 
 	async findOneByCondition(condition = {}): Promise<T> {
@@ -37,19 +30,13 @@ export abstract class BaseRepositoryAbstract<T>
 	}
 
 	async findAll(
-		condition = {},
+		condition: FilterQuery<T>,
 		projection?: string,
-		options?: SortParams & PaginateParams & AnyObject,
+		options?: QueryOptions<T>,
 	): Promise<FindAllResponse<T>> {
 		const [count, items] = await Promise.all([
 			this.model.count({ ...condition, deleted_at: null }),
-			this.model.find({ ...condition, deleted_at: null }, projection, {
-				limit: options?.limit ?? 20,
-				skip: options?.offset ?? 0,
-				sort: options?.sort_by
-					? { [options?.sort_by]: options?.sort_type }
-					: {},
-			}),
+			this.model.find({ ...condition, deleted_at: null }, projection, options),
 		]);
 		return {
 			count,
