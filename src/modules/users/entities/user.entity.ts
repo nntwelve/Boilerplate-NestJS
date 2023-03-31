@@ -6,15 +6,17 @@ import { Address, AddressSchema } from './address.entity';
 export type UserDocument = HydratedDocument<User>;
 
 export enum USER_ROLE {
-	Admin = 'ADMIN',
-	User = 'USER',
+	ADMIN = 'Admin',
+	USER = 'User',
 }
 
 export enum GENDER {
-	Male = 'MALE',
-	Female = 'FEMALE',
-	Other = 'OTHER',
+	MALE = 'Male',
+	FEMALE = 'Female',
+	OTHER = 'Other',
 }
+
+export enum TOPIC {}
 @Schema({
 	timestamps: {
 		createdAt: 'created_at',
@@ -70,7 +72,7 @@ export class User extends BaseEntity {
 	point: number;
 
 	@Prop({
-		default: USER_ROLE.User,
+		default: USER_ROLE.USER,
 		enum: USER_ROLE,
 	})
 	role: USER_ROLE;
