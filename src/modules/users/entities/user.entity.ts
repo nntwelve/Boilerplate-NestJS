@@ -16,7 +16,13 @@ export enum GENDER {
 	OTHER = 'Other',
 }
 
-export enum TOPIC {}
+export enum TOPIC {
+	NATURE = 'Nature',
+	FOOD = 'Food',
+	SPORT = 'Sport',
+	MUSIC = 'Music',
+	MOVIE = 'Movie',
+}
 @Schema({
 	timestamps: {
 		createdAt: 'created_at',
@@ -36,6 +42,12 @@ export class User extends BaseEntity {
 		match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
 	})
 	email: string;
+
+	@Prop({
+		type: [String],
+		enum: TOPIC,
+	})
+	interested_topics: TOPIC[];
 
 	@Prop({
 		match: /^([+]\d{2})?\d{10}$/,
@@ -81,9 +93,13 @@ export class User extends BaseEntity {
 	headline: string;
 
 	@Prop({
-		type: AddressSchema,
+		type: [
+			{
+				type: AddressSchema,
+			},
+		],
 	})
-	address: Address;
+	address: Address[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
