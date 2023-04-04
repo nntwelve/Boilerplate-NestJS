@@ -1,4 +1,7 @@
-import { FlashCard } from '@modules/flash-cards/entities/flash-card.entity';
+import {
+	FlashCard,
+	FlashCardDocument,
+} from '@modules/flash-cards/entities/flash-card.entity';
 import { FlashCardsRepositoryInterface } from '@modules/flash-cards/interfaces/flash-cards.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,12 +10,12 @@ import { BaseRepositoryAbstract } from './base/base.abstract.repository';
 
 @Injectable()
 export class FlashCardsRepository
-	extends BaseRepositoryAbstract<FlashCard>
+	extends BaseRepositoryAbstract<FlashCardDocument>
 	implements FlashCardsRepositoryInterface
 {
 	constructor(
 		@InjectModel(FlashCard.name)
-		private readonly flash_cards_repository: Model<FlashCard>,
+		private readonly flash_cards_repository: Model<FlashCardDocument>,
 	) {
 		super(flash_cards_repository);
 	}
