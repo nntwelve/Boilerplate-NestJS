@@ -6,18 +6,21 @@ import {
 	Patch,
 	Param,
 	Delete,
+	UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
 
 @Controller('users')
+@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
 	constructor(private readonly users_service: UsersService) {}
 
 	@Post()
 	create(@Body() create_user_dto: CreateUserDto) {
-		console.log(create_user_dto);
 		return this.users_service.create(create_user_dto);
 	}
 
@@ -27,8 +30,8 @@ export class UsersController {
 	}
 
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.users_service.findOne(id);
+	async findOne(@Param('id') id: string) {
+		return await this.users_service.findOne(id);
 	}
 
 	@Patch(':id')
