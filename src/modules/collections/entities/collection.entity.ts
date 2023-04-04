@@ -9,6 +9,8 @@ export enum COLLECTION_LEVEL {
 	HARD = 'hard',
 	CHAOS = 'chaos',
 }
+
+export type CollectionDocument = mongoose.HydratedDocument<Collection>;
 @Schema()
 export class Collection extends BaseEntity {
 	@Prop({ required: true })
