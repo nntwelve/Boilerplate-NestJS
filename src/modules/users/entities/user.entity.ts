@@ -1,14 +1,13 @@
 import { BaseEntity } from '@modules/shared/base/base.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Model } from 'mongoose';
 import { Address, AddressSchema } from './address.entity';
+import { Type } from 'class-transformer';
+import { UserRole } from '@modules/user-roles/entities/user-role.entity';
+import { NextFunction } from 'express';
+import { FlashCardDocument } from '@modules/flash-cards/entities/flash-card.entity';
 
 export type UserDocument = HydratedDocument<User>;
-
-export enum USER_ROLE {
-	ADMIN = 'Admin',
-	USER = 'User',
-}
 
 export enum GENDER {
 	MALE = 'Male',
@@ -30,6 +29,9 @@ export enum TOPIC {
 	},
 })
 export class User extends BaseEntity {
+	@Prop()
+	friendly_id: number;
+
 	@Prop({ required: true, minlength: 2, maxlength: 60 })
 	first_name: string;
 
@@ -84,10 +86,10 @@ export class User extends BaseEntity {
 	point: number;
 
 	@Prop({
-		default: USER_ROLE.USER,
-		enum: USER_ROLE,
+		type: mongoose.Schema.Types.ObjectId,
+		ref: UserRole.name,
 	})
-	role: USER_ROLE;
+	role: UserRole;
 
 	@Prop()
 	headline: string;
@@ -99,7 +101,26 @@ export class User extends BaseEntity {
 			},
 		],
 	})
+	@Type(() => Address)
 	address: Address[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+export const UserSchemaFactory = (
+	flash_card_model: Model<FlashCardDocument>,
+) => {
+	const user_schema = UserSchema;
+
+	user_schema.pre('findOneAndDelete', async function (next: NextFunction) {
+		// OTHER USEFUL METHOD: getOptions, getPopulatedPaths, getQuery = getFilter, getUpdate
+		const doc = await this.model.findOne(this.getFilter());
+		await flash_card_model
+			.deleteMany({
+				user: doc._id,
+			})
+			.exec();
+		return next();
+	});
+	return user_schema;
+};
