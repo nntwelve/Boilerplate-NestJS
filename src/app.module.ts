@@ -8,6 +8,8 @@ import { database_config } from '@configs/configuration.config';
 import { UsersModule } from '@modules/users/users.module';
 import { FlashCardsModule } from '@modules/flash-cards/flash-cards.module';
 import { CollectionsModule } from '@modules/collections/collections.module';
+import { UserRolesModule } from '@modules/user-roles/user-roles.module';
+import { TopicsModule } from '@modules/topics/topics.module';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -39,7 +41,9 @@ import { CollectionsModule } from '@modules/collections/collections.module';
 			}),
 			inject: [ConfigService],
 		}),
+		UserRolesModule,
 		UsersModule,
+		TopicsModule,
 		FlashCardsModule,
 		CollectionsModule,
 	],
