@@ -9,6 +9,10 @@ import {
 	FlashCard,
 	FlashCardSchema,
 } from '@modules/flash-cards/entities/flash-card.entity';
+import {
+	Collection,
+	CollectionSchema,
+} from '@modules/collections/entities/collection.entity';
 
 @Module({
 	imports: [
@@ -16,10 +20,11 @@ import {
 			{
 				name: User.name,
 				useFactory: UserSchemaFactory,
-				inject: [getModelToken(FlashCard.name)],
+				inject: [getModelToken(FlashCard.name), getModelToken(Collection.name)],
 				imports: [
 					MongooseModule.forFeature([
 						{ name: FlashCard.name, schema: FlashCardSchema },
+						{ name: Collection.name, schema: CollectionSchema },
 					]),
 				],
 			},
