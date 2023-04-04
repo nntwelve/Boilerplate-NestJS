@@ -13,6 +13,7 @@ export interface Read<T> {
 		options?: object,
 	): Promise<FindAllResponse<T>>;
 	findOne(id: string): Promise<T>;
+	findOneByCondition(filter: Partial<T>): Promise<T>;
 }
 
 export interface BaseServiceInterface<T> extends Write<T>, Read<T> {}

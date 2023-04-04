@@ -67,6 +67,6 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 		if (!delete_item) {
 			return false;
 		}
-		return !!(await this.model.findByIdAndDelete(id));
+		return !!(await this.model.findOneAndDelete({ _id: id }));
 	}
 }
