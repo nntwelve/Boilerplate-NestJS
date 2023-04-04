@@ -1,4 +1,7 @@
-import { Collection } from '@modules/collections/entities/collection.entity';
+import {
+	Collection,
+	CollectionDocument,
+} from '@modules/collections/entities/collection.entity';
 import { CollectionRepositoryInterface } from '@modules/collections/interfaces/collections.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,12 +10,12 @@ import { BaseRepositoryAbstract } from './base/base.abstract.repository';
 
 @Injectable()
 export class CollectionRepository
-	extends BaseRepositoryAbstract<Collection>
+	extends BaseRepositoryAbstract<CollectionDocument>
 	implements CollectionRepositoryInterface
 {
 	constructor(
 		@InjectModel(Collection.name)
-		private readonly collection_repository: Model<Collection>,
+		private readonly collection_repository: Model<CollectionDocument>,
 	) {
 		super(collection_repository);
 	}
