@@ -6,6 +6,7 @@ import {
 	MaxLength,
 } from 'class-validator';
 import { COLLECTION_LEVEL } from '../entities/collection.entity';
+import { User } from '@modules/users/entities/user.entity';
 
 export class CreateCollectionDto {
 	@IsNotEmpty()
@@ -24,4 +25,7 @@ export class CreateCollectionDto {
 	@IsOptional()
 	@IsBoolean()
 	is_public: boolean;
+
+	@IsNotEmpty()
+	user?: User;
 }
