@@ -16,12 +16,12 @@ export enum GENDER {
 	OTHER = 'Other',
 }
 
-export enum TOPIC {
-	NATURE = 'Nature',
-	FOOD = 'Food',
-	SPORT = 'Sport',
-	MUSIC = 'Music',
-	MOVIE = 'Movie',
+export enum LANGUAGES {
+	ENGLISH = 'English',
+	FRENCH = 'French',
+	JAPANESE = 'Japanese',
+	KOREAN = 'Korean',
+	SPANISH = 'Spanish',
 }
 @Schema({
 	timestamps: {
@@ -48,9 +48,9 @@ export class User extends BaseEntity {
 
 	@Prop({
 		type: [String],
-		enum: TOPIC,
+		enum: LANGUAGES,
 	})
-	interested_topics: TOPIC[];
+	interested_topics: LANGUAGES[];
 
 	@Prop({
 		match: /^([+]\d{2})?\d{10}$/,

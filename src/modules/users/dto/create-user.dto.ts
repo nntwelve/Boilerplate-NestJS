@@ -10,7 +10,7 @@ import {
 	MaxLength,
 	ValidateNested,
 } from 'class-validator';
-import { TOPIC } from '../entities/user.entity';
+import { LANGUAGES } from '../entities/user.entity';
 import { CreateAddressDto } from './create-address.dto';
 
 export class CreateUserDto {
@@ -45,6 +45,6 @@ export class CreateUserDto {
 	@IsOptional()
 	@IsArray()
 	@ArrayMinSize(1)
-	@IsEnum(TOPIC, { each: true })
-	interested_topics: TOPIC[];
+	@IsEnum(LANGUAGES, { each: true })
+	interested_languages: LANGUAGES[];
 }
