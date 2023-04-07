@@ -50,7 +50,7 @@ export class User extends BaseEntity {
 		type: [String],
 		enum: LANGUAGES,
 	})
-	interested_topics: LANGUAGES[];
+	interested_languages: LANGUAGES[];
 
 	@Prop({
 		match: /^([+]\d{2})?\d{10}$/,
