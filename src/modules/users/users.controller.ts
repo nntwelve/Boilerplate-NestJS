@@ -7,6 +7,7 @@ import {
 	Param,
 	Delete,
 	UseInterceptors,
+	SerializeOptions,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,6 +25,9 @@ export class UsersController {
 		return this.users_service.create(create_user_dto);
 	}
 
+	@SerializeOptions({
+		excludePrefixes: ['first', 'last'],
+	})
 	@Get()
 	findAll() {
 		return this.users_service.findAll();
