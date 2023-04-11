@@ -37,13 +37,6 @@ export class UsersService extends BaseServiceAbstract<User> {
 		filter?: object,
 		projection?: string,
 	): Promise<FindAllResponse<User>> {
-		console.log(
-			await this.users_repository.findAllWithPopulate(
-				filter,
-				projection,
-				'role',
-			),
-		);
 		return await this.users_repository.findAllWithPopulate(
 			filter,
 			projection,
