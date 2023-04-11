@@ -6,7 +6,7 @@ import {
 import { ClassTransformOptions, plainToClass } from 'class-transformer';
 import { Document } from 'mongoose';
 
-function MongooseClassSerializerInterceptor(
+export default function MongooseClassSerializerInterceptor(
 	classToIntercept: Type,
 ): typeof ClassSerializerInterceptor {
 	return class Interceptor extends ClassSerializerInterceptor {
@@ -14,7 +14,10 @@ function MongooseClassSerializerInterceptor(
 			if (!(document instanceof Document)) {
 				return document;
 			}
-			return plainToClass(classToIntercept, document.toJSON());
+			console.log(document.toJSON());
+			return plainToClass(classToIntercept, document.toJSON(), {
+				excludePrefixes: ['_'],
+			});
 		}
 
 		private prepareResponse(
@@ -46,5 +49,3 @@ function MongooseClassSerializerInterceptor(
 		}
 	};
 }
-
-export default MongooseClassSerializerInterceptor;
