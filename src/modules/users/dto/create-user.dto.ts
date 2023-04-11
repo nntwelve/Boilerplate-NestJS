@@ -6,6 +6,7 @@ import {
 	IsEnum,
 	IsNotEmpty,
 	IsOptional,
+	IsPhoneNumber,
 	IsStrongPassword,
 	MaxLength,
 	ValidateNested,
@@ -30,6 +31,10 @@ export class CreateUserDto {
 	@IsNotEmpty()
 	@MaxLength(50)
 	username: string;
+
+	@IsOptional()
+	// @IsPhoneNumber()
+	phone_number: string;
 
 	@IsNotEmpty()
 	@IsStrongPassword()
