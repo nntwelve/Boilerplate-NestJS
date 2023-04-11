@@ -6,12 +6,16 @@ import {
 	Patch,
 	Param,
 	Delete,
+	UseInterceptors,
 } from '@nestjs/common';
 import { UserRolesService } from './user-roles.service';
 import { CreateUserRoleDto } from './dto/create-user-role.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
+import { UserRole } from './entities/user-role.entity';
 
 @Controller('user-roles')
+@UseInterceptors(MongooseClassSerializerInterceptor(UserRole))
 export class UserRolesController {
 	constructor(private readonly user_roles_service: UserRolesService) {}
 
