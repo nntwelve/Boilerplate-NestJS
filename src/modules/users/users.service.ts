@@ -5,6 +5,7 @@ import { UsersRepositoryInterface } from './interfaces/users.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRolesService } from '@modules/user-roles/user-roles.service';
 import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
+import { FindAllResponse } from 'src/types/common.type';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -30,5 +31,23 @@ export class UsersService extends BaseServiceAbstract<User> {
 			role: user_role,
 		});
 		return user;
+	}
+
+	async findAll(
+		filter?: object,
+		projection?: string,
+	): Promise<FindAllResponse<User>> {
+		console.log(
+			await this.users_repository.findAllWithPopulate(
+				filter,
+				projection,
+				'role',
+			),
+		);
+		return await this.users_repository.findAllWithPopulate(
+			filter,
+			projection,
+			'role',
+		);
 	}
 }
