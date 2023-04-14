@@ -18,7 +18,7 @@ export class UsersRepository
 		super(users_repository);
 	}
 
-	async findAllWithPopulate(
+	async findAllWithSubFields(
 		condition: FilterQuery<UserDocument>,
 		projection?: string,
 		populate?: string[] | PopulateOptions | PopulateOptions[],

@@ -37,7 +37,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 		filter?: object,
 		projection?: string,
 	): Promise<FindAllResponse<User>> {
-		return await this.users_repository.findAllWithPopulate(
+		return await this.users_repository.findAllWithSubFields(
 			filter,
 			projection,
 			'role',

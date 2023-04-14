@@ -4,7 +4,7 @@ import { FindAllResponse } from 'src/types/common.type';
 
 export interface UsersRepositoryInterface
 	extends BaseRepositoryInterface<User> {
-	findAllWithPopulate(
+	findAllWithSubFields(
 		condition: object,
 		projection?: string,
 		populate?: string[] | any,
