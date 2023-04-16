@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
 import { User } from './entities/user.entity';
 import { UsersRepositoryInterface } from './interfaces/users.interface';
@@ -42,5 +42,30 @@ export class UsersService extends BaseServiceAbstract<User> {
 			projection,
 			'role',
 		);
+	}
+
+	async getUserByEmail(email: string): Promise<User> {
+		try {
+			const user = await this.users_repository.findOneByCondition({ email });
+			if (!user) {
+				throw new NotFoundException();
+			}
+			return user;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async setCurrentRefreshToken(
+		id: string,
+		hashed_token: string,
+	): Promise<void> {
+		try {
+			await this.users_repository.update(id, {
+				current_refresh_token: hashed_token,
+			});
+		} catch (error) {
+			throw error;
+		}
 	}
 }

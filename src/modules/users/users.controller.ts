@@ -8,12 +8,14 @@ import {
 	Delete,
 	UseInterceptors,
 	SerializeOptions,
+	UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 
 @Controller('users')
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
@@ -29,6 +31,7 @@ export class UsersController {
 		excludePrefixes: ['first', 'last'],
 	})
 	@Get()
+	@UseGuards(JwtAccessTokenGuard)
 	findAll() {
 		return this.users_service.findAll();
 	}
