@@ -12,8 +12,8 @@ export class TopicsRepository
 {
 	constructor(
 		@InjectModel(Topic.name)
-		private readonly topics_repository: Model<TopicDocument>,
+		private readonly topic_model: Model<TopicDocument>,
 	) {
-		super(topics_repository);
+		super(topic_model);
 	}
 }

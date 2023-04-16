@@ -13,9 +13,9 @@ export class UsersRepository
 {
 	constructor(
 		@InjectModel(User.name)
-		private readonly users_repository: Model<UserDocument>,
+		private readonly user_model: Model<UserDocument>,
 	) {
-		super(users_repository);
+		super(user_model);
 	}
 
 	async findAllWithSubFields(
@@ -24,8 +24,8 @@ export class UsersRepository
 		populate?: string[] | PopulateOptions | PopulateOptions[],
 	): Promise<FindAllResponse<UserDocument>> {
 		const [count, items] = await Promise.all([
-			this.users_repository.count({ ...condition, deleted_at: null }),
-			this.users_repository
+			this.user_model.count({ ...condition, deleted_at: null }),
+			this.user_model
 				.find({ ...condition, deleted_at: null }, projection)
 				.populate(populate),
 		]);
