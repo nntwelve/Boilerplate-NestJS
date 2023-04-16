@@ -10,6 +10,7 @@ import { FlashCardsModule } from '@modules/flash-cards/flash-cards.module';
 import { CollectionsModule } from '@modules/collections/collections.module';
 import { UserRolesModule } from '@modules/user-roles/user-roles.module';
 import { TopicsModule } from '@modules/topics/topics.module';
+import { AuthModule } from './modules/auth/auth.module';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -46,6 +47,7 @@ import { TopicsModule } from '@modules/topics/topics.module';
 		TopicsModule,
 		FlashCardsModule,
 		CollectionsModule,
+		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
