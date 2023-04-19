@@ -14,7 +14,6 @@ export default function MongooseClassSerializerInterceptor(
 			if (!(document instanceof Document)) {
 				return document;
 			}
-			console.log(document.toJSON());
 			return plainToClass(classToIntercept, document.toJSON(), {
 				excludePrefixes: ['_'],
 			});
