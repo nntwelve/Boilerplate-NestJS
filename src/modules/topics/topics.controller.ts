@@ -6,12 +6,20 @@ import {
 	Patch,
 	Param,
 	Delete,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
 import { TopicsService } from './topics.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { Public } from 'src/decorators/auth.decorators';
+import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
+import { Topic } from './entities/topic.entity';
 
 @Controller('topics')
+@UseGuards(JwtAccessTokenGuard)
+@UseInterceptors(MongooseClassSerializerInterceptor(Topic))
 export class TopicsController {
 	constructor(private readonly topicsService: TopicsService) {}
 
@@ -21,6 +29,7 @@ export class TopicsController {
 	}
 
 	@Get()
+	@Public()
 	findAll() {
 		return this.topicsService.findAll();
 	}
