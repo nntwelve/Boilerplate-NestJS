@@ -56,6 +56,14 @@ export class UsersService extends BaseServiceAbstract<User> {
 		}
 	}
 
+	async getUserWithRole(user_id: string): Promise<User> {
+		try {
+			return await this.users_repository.getUserWithRole(user_id);
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	async setCurrentRefreshToken(
 		id: string,
 		hashed_token: string,

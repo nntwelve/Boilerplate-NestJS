@@ -9,4 +9,5 @@ export interface UsersRepositoryInterface
 		projection?: string,
 		populate?: string[] | any,
 	): Promise<FindAllResponse<User>>;
+	getUserWithRole(user_id: string): Promise<User>;
 }
