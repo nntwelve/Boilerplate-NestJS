@@ -13,8 +13,10 @@ import { CreateUserRoleDto } from './dto/create-user-role.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
 import { UserRole } from './entities/user-role.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('user-roles')
+@ApiTags('user-roles')
 @UseInterceptors(MongooseClassSerializerInterceptor(UserRole))
 export class UserRolesController {
 	constructor(private readonly user_roles_service: UserRolesService) {}

@@ -12,8 +12,10 @@ import { FlashCardsService } from './flash-cards.service';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
 import { UpdateFlashCardDto } from './dto/update-flash-card.dto';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('flash-cards')
+@ApiTags('flash-cards')
 export class FlashCardsController {
 	constructor(private readonly flash_cards_service: FlashCardsService) {}
 

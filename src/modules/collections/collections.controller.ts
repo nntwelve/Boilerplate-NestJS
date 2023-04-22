@@ -10,8 +10,10 @@ import {
 import { CollectionsService } from './collections.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('collections')
+@ApiTags('collections')
 export class CollectionsController {
 	constructor(private readonly collections_service: CollectionsService) {}
 

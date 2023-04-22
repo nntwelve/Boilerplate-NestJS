@@ -16,8 +16,10 @@ import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard
 import { Public } from 'src/decorators/auth.decorator';
 import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
 import { Topic } from './entities/topic.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('topics')
+@ApiTags('topics')
 @UseGuards(JwtAccessTokenGuard)
 @UseInterceptors(MongooseClassSerializerInterceptor(Topic))
 export class TopicsController {
