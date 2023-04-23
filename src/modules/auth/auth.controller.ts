@@ -4,7 +4,7 @@ import { LocalAuthGuard } from './guards/local.guard';
 import { RequestWithUser } from 'src/types/requests.type';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
 import { SignUpDto } from './dto/sign-up.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -12,6 +12,20 @@ export class AuthController {
 	constructor(private readonly auth_service: AuthService) {}
 
 	@Post('sign-up')
+	@ApiOperation({
+		summary: 'User sign up to platform',
+		description: '## User sign up',
+		servers: [
+			{
+				url: 'http://localhost:3333',
+				description: 'Current server',
+			},
+			{
+				url: 'http://localhost:9000',
+				description: 'Authentication service if exist',
+			},
+		],
+	})
 	@ApiBody({
 		type: SignUpDto,
 		examples: {

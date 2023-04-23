@@ -19,7 +19,7 @@ import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
 @ApiTags('users')
@@ -28,6 +28,13 @@ export class UsersController {
 	constructor(private readonly users_service: UsersService) {}
 
 	@Post()
+	@ApiOperation({
+		summary: 'Admin create new user',
+		description: `
+* Only admin can use this API
+
+* Admin create user and give some specific information`,
+	})
 	create(@Body() create_user_dto: CreateUserDto) {
 		return this.users_service.create(create_user_dto);
 	}
