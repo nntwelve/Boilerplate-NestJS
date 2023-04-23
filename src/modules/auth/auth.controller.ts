@@ -4,7 +4,7 @@ import { LocalAuthGuard } from './guards/local.guard';
 import { RequestWithUser } from 'src/types/requests.type';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
 import { SignUpDto } from './dto/sign-up.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -12,6 +12,27 @@ export class AuthController {
 	constructor(private readonly auth_service: AuthService) {}
 
 	@Post('sign-up')
+	@ApiBody({
+		type: SignUpDto,
+		examples: {
+			user_1: {
+				value: {
+					first_name: 'John',
+					last_name: 'Doe',
+					email: 'johndoe@example.com',
+					password: '1232@asdS',
+				} as SignUpDto,
+			},
+			user_2: {
+				value: {
+					first_name: 'Michael',
+					last_name: 'Smith',
+					email: 'michaelsmith@example.com',
+					password: '1232@asdS',
+				} as SignUpDto,
+			},
+		},
+	})
 	async signUp(@Body() sign_up_dto: SignUpDto) {
 		return await this.auth_service.signUp(sign_up_dto);
 	}
