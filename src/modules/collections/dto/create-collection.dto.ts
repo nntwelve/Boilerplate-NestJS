@@ -1,5 +1,6 @@
 import {
 	IsBoolean,
+	IsBooleanString,
 	IsEnum,
 	IsNotEmpty,
 	IsOptional,
@@ -23,9 +24,8 @@ export class CreateCollectionDto {
 	image: string;
 
 	@IsOptional()
-	@IsBoolean()
+	@IsBooleanString()
 	is_public: boolean;
 
-	@IsNotEmpty()
 	user?: User;
 }

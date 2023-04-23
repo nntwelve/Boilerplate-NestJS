@@ -53,6 +53,27 @@ export class AuthController {
 
 	@UseGuards(LocalAuthGuard)
 	@Post('sign-in')
+	@ApiBody({
+		type: SignUpDto,
+		examples: {
+			user_1: {
+				value: {
+					first_name: 'John',
+					last_name: 'Doe',
+					email: 'johndoe@example.com',
+					password: '1232@asdS',
+				} as SignUpDto,
+			},
+			user_2: {
+				value: {
+					first_name: 'Michael',
+					last_name: 'Smith',
+					email: 'michaelsmith@example.com',
+					password: '1232@asdS',
+				} as SignUpDto,
+			},
+		},
+	})
 	async signIn(@Req() request: RequestWithUser) {
 		const { user } = request;
 		return await this.auth_service.signIn(user._id.toString());

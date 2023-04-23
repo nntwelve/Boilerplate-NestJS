@@ -1,11 +1,10 @@
 import { User } from '@modules/users/entities/user.entity';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateFlashCardDto {
 	@IsNotEmpty()
 	vocabulary: string;
 
-	@IsNotEmpty()
 	image: string;
 
 	@IsNotEmpty()
@@ -13,6 +12,11 @@ export class CreateFlashCardDto {
 
 	@IsNotEmpty()
 	meaning: string;
+
+	@IsOptional()
+	@IsArray()
+	@ArrayMinSize(1)
+	examples?: string[];
 
 	@IsOptional()
 	pronunciation: string;
