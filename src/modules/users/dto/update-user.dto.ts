@@ -28,3 +28,9 @@ export class UpdateUserDto extends PartialType(
 	@MaxLength(200)
 	headline?: string;
 }
+
+export class UpdateStudentCardDto {
+	student_card_front: string;
+
+	student_card_back: string;
+}
