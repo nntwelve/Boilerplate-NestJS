@@ -10,6 +10,8 @@ import {
 	UploadedFile,
 	UseGuards,
 	Req,
+	Query,
+	ParseIntPipe,
 } from '@nestjs/common';
 import { CollectionsService } from './collections.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
@@ -19,6 +21,8 @@ import {
 	ApiBody,
 	ApiConsumes,
 	ApiOperation,
+	ApiParam,
+	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -79,11 +83,74 @@ export class CollectionsController {
 	}
 
 	@Get()
-	findAll() {
+	@ApiQuery({
+		name: 'offset',
+		type: Number,
+		examples: {
+			'0': {
+				value: 0,
+				description: 'Start from 0',
+			},
+			'10': {
+				value: 10,
+				description: `Skip 10 collection`,
+			},
+		},
+	})
+	@ApiQuery({
+		name: 'limit',
+		type: Number,
+		examples: {
+			'10': {
+				value: 10,
+				description: `Get 10 collection`,
+			},
+			'50': {
+				value: 50,
+				description: `Get 50 collection`,
+			},
+		},
+	})
+	@ApiQuery({
+		name: 'level',
+		type: 'array',
+		examples: {
+			one_level_type: {
+				value: [COLLECTION_LEVEL.HARD],
+			},
+			two_level_type: {
+				value: [COLLECTION_LEVEL.EASY, COLLECTION_LEVEL.MEDIUM],
+			},
+		},
+		required: false,
+	})
+	findAll(
+		@Query('offset', ParseIntPipe) offset: number,
+		@Query('limit', ParseIntPipe) limit: number,
+		@Query('level') level: string[],
+	) {
+		if (level && typeof level === 'string') {
+			level = [level];
+		}
+		console.log({ level });
 		return this.collections_service.findAll();
 	}
 
 	@Get(':id')
+	@ApiParam({
+		name: 'id',
+		type: 'string',
+		examples: {
+			migration_id_1: {
+				value: '644293b09150e9f67d9bb75d',
+				description: `Collection Kitchen vocabulary`,
+			},
+			migration_id_2: {
+				value: '6442941027467f9a755ff76d',
+				description: `Collection Sport vocabulary`,
+			},
+		},
+	})
 	findOne(@Param('id') id: string) {
 		return this.collections_service.findOne(id);
 	}
