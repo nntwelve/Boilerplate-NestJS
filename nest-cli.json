@@ -7,7 +7,7 @@
 		"plugins": ["@nestjs/swagger"],
 		"assets": [
 			{
-				"include": "served/*",
+				"include": "served/**/*",
 				"watchAssets": true
 			}
 		]
