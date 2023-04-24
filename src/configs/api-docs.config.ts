@@ -9,5 +9,7 @@ export function configSwagger(app: INestApplication) {
 		.addSecurity('token', { type: 'http', scheme: 'bearer' })
 		.build();
 	const document = SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup('api-docs', app, document);
+	SwaggerModule.setup('api-docs', app, document, {
+		swaggerOptions: { persistAuthorization: true },
+	});
 }

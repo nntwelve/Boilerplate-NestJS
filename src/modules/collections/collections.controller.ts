@@ -29,6 +29,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { COLLECTION_LEVEL } from './entities/collection.entity';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RequestWithUser } from 'src/types/requests.type';
+import {
+	ApiBodyWithSingleFile,
+	ApiDocsPagination,
+} from 'src/decorators/swagger-form-data.decorator';
 
 @Controller('collections')
 @ApiTags('collections')
@@ -40,34 +44,31 @@ export class CollectionsController {
 		summary: 'User create their collection',
 	})
 	@ApiBearerAuth('token')
-	@ApiConsumes('multipart/form-data')
-	@ApiBody({
-		schema: {
-			type: 'object',
-			properties: {
-				name: {
-					type: 'string',
-					default: 'Learn Kitchen Vocabulary',
-				},
-				description: { type: 'string', default: 'Some description' },
-				level: {
-					type: 'string',
-					enum: Object.values(COLLECTION_LEVEL),
-					default: COLLECTION_LEVEL.CHAOS,
-				},
-				is_public: {
-					type: 'boolean',
-					default: true,
-				},
-				image: {
-					type: 'string',
-					format: 'binary',
-				},
-			},
-			required: ['name', 'level', 'is_public', 'image'],
-		},
-	})
 	@UseInterceptors(FileInterceptor('image'))
+	@ApiBodyWithSingleFile(
+		'image',
+		{
+			name: {
+				type: 'string',
+				default: 'Learn Kitchen Vocabulary',
+			},
+			description: { type: 'string', default: 'Some description' },
+			level: {
+				type: 'string',
+				enum: Object.values(COLLECTION_LEVEL),
+				default: COLLECTION_LEVEL.CHAOS,
+			},
+			is_public: {
+				type: 'boolean',
+				default: true,
+			},
+			image: {
+				type: 'string',
+				format: 'binary',
+			},
+		},
+		['name', 'level', 'is_public', 'image'],
+	)
 	@UseGuards(JwtAccessTokenGuard)
 	create(
 		@Req() request: RequestWithUser,
@@ -83,34 +84,7 @@ export class CollectionsController {
 	}
 
 	@Get()
-	@ApiQuery({
-		name: 'offset',
-		type: Number,
-		examples: {
-			'0': {
-				value: 0,
-				description: 'Start from 0',
-			},
-			'10': {
-				value: 10,
-				description: `Skip 10 collection`,
-			},
-		},
-	})
-	@ApiQuery({
-		name: 'limit',
-		type: Number,
-		examples: {
-			'10': {
-				value: 10,
-				description: `Get 10 collection`,
-			},
-			'50': {
-				value: 50,
-				description: `Get 50 collection`,
-			},
-		},
-	})
+	@ApiDocsPagination('collection')
 	@ApiQuery({
 		name: 'level',
 		type: 'array',
