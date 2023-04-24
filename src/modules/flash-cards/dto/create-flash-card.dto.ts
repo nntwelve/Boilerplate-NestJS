@@ -1,5 +1,11 @@
 import { User } from '@modules/users/entities/user.entity';
-import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+	ArrayMaxSize,
+	ArrayMinSize,
+	IsArray,
+	IsNotEmpty,
+	IsOptional,
+} from 'class-validator';
 
 export class CreateFlashCardDto {
 	@IsNotEmpty()

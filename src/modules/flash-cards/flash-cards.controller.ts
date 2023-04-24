@@ -24,6 +24,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RequestWithUser } from 'src/types/requests.type';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { SwaggerArrayConversion } from 'src/interceptors/swagger-array-conversion.interceptor';
 
 @Controller('flash-cards')
 @ApiTags('flash-cards')
@@ -56,7 +57,7 @@ export class FlashCardsController {
 					type: 'string',
 					default: 'prəˈviZHən',
 				},
-				examples: {
+				'examples[]': {
 					type: 'array',
 					items: {
 						type: 'string',
@@ -76,6 +77,7 @@ export class FlashCardsController {
 			required: ['vocabulary', 'definition', 'meaning', 'image'],
 		},
 	})
+	@UseInterceptors(new SwaggerArrayConversion('examples'))
 	@UseInterceptors(FileInterceptor('image'))
 	@UseGuards(JwtAccessTokenGuard)
 	create(
@@ -83,7 +85,7 @@ export class FlashCardsController {
 		@UploadedFile() image: Express.Multer.File,
 		@Body() create_flash_card_dto: CreateFlashCardDto,
 	) {
-		console.log(create_flash_card_dto.examples);
+		console.log(create_flash_card_dto);
 		return this.flash_cards_service.create({
 			...create_flash_card_dto,
 			user: request.user,
