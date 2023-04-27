@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TokenPayload } from '../interfaces/token.interface';
-import { at_public_key } from 'src/constraints/jwt.constraint';
+import { access_token_public_key } from 'src/constraints/jwt.constraint';
 
 @Injectable()
 export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
@@ -11,7 +11,7 @@ export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 			ignoreExpiration: true,
-			secretOrKey: at_public_key,
+			secretOrKey: access_token_public_key,
 		});
 	}
 

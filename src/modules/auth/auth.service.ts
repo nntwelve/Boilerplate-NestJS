@@ -10,7 +10,10 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './interfaces/token.interface';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
-import { at_private_key, rt_private_key } from 'src/constraints/jwt.constraint';
+import {
+	access_token_private_key,
+	refresh_token_private_key,
+} from 'src/constraints/jwt.constraint';
 import { SignUpDto } from './dto/sign-up.dto';
 
 @Injectable()
@@ -118,7 +121,7 @@ export class AuthService {
 	generateAccessToken(payload: TokenPayload) {
 		return this.jwt_service.sign(payload, {
 			algorithm: 'RS256',
-			privateKey: at_private_key,
+			privateKey: access_token_private_key,
 			expiresIn: `${this.config_service.get<string>(
 				'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
 			)}s`,
@@ -128,7 +131,7 @@ export class AuthService {
 	generateRefreshToken(payload: TokenPayload) {
 		return this.jwt_service.sign(payload, {
 			algorithm: 'RS256',
-			privateKey: rt_private_key,
+			privateKey: refresh_token_private_key,
 			expiresIn: `${this.config_service.get<string>(
 				'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
 			)}s`,

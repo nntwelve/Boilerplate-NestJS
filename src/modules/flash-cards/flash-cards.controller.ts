@@ -6,16 +6,19 @@ import {
 	Patch,
 	Param,
 	Delete,
+	UseGuards,
 } from '@nestjs/common';
 import { FlashCardsService } from './flash-cards.service';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
 import { UpdateFlashCardDto } from './dto/update-flash-card.dto';
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 
 @Controller('flash-cards')
 export class FlashCardsController {
 	constructor(private readonly flash_cards_service: FlashCardsService) {}
 
 	@Post()
+	@UseGuards(JwtAccessTokenGuard)
 	create(@Body() create_flash_card_dto: CreateFlashCardDto) {
 		return this.flash_cards_service.create(create_flash_card_dto);
 	}
