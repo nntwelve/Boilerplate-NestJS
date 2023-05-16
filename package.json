@@ -18,7 +18,7 @@
 		"start:prod": "NODE_ENV=production node dist/main",
 		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
 		"test": "jest",
-		"test:watch": "jest --watch",
+		"test:watch": "jest --detectOpenHandles --watch",
 		"test:cov": "jest --coverage",
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json"
@@ -80,6 +80,12 @@
 			"json",
 			"ts"
 		],
+		"moduleNameMapper": {
+			"^src/(.*)$": "<rootDir>/$1",
+			"^@modules/(.*)$": "<rootDir>/modules/$1",
+			"^@config/(.*)$": "<rootDir>/configs/$1",
+			"^@repositories/(.*)$": "<rootDir>/repositories/$1"
+		},
 		"rootDir": "src",
 		"testRegex": ".*\\.spec\\.ts$",
 		"transform": {
