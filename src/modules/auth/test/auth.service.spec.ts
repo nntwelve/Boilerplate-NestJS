@@ -19,12 +19,12 @@ import { mockConfigService } from '../__mocks__/config.service';
 import { mockJwtService } from '../__mocks__/jwt.service';
 
 // STUB
-import { userStub } from '../../users/test/stubs/user.stub';
+import { createUserStub } from '../../users/test/stubs/user.stub';
 import {
-	access_token_stub,
-	refresh_token_stub,
-	token_stub,
-} from './stubs/token.stub';
+	mock_access_token,
+	mock_refresh_token,
+	mock_token,
+} from './mocks/tokens.stub';
 
 jest.mock('../../users/users.service');
 describe('AuthService', function () {
@@ -59,14 +59,15 @@ describe('AuthService', function () {
 			// Arrange
 			jest
 				.spyOn(users_service, 'findOneByCondition')
-				.mockResolvedValueOnce(userStub());
+				.mockResolvedValueOnce(createUserStub());
 			// Act && Assert
-			await expect(auth_service.signUp(userStub())).rejects.toThrow(
+			await expect(auth_service.signUp(createUserStub())).rejects.toThrow(
 				ConflictException,
 			);
 		});
 		it('should successfully create and return a new user if email is not taken', async () => {
 			// Arrange
+			const user_stub = createUserStub();
 			const mock_sign_up_dto: SignUpDto = {
 				email: 'michaelsmith@example.com',
 				first_name: 'Michael',
@@ -78,10 +79,10 @@ describe('AuthService', function () {
 				.mockResolvedValueOnce(null);
 			jest
 				.spyOn(auth_service, 'generateAccessToken')
-				.mockReturnValue(access_token_stub);
+				.mockReturnValue(mock_access_token);
 			jest
 				.spyOn(auth_service, 'generateRefreshToken')
-				.mockReturnValue(refresh_token_stub);
+				.mockReturnValue(mock_refresh_token);
 			jest
 				.spyOn(bcrypt, 'hash')
 				.mockImplementationOnce(() => mock_sign_up_dto.password);
@@ -96,18 +97,18 @@ describe('AuthService', function () {
 				username: expect.any(String),
 			});
 			expect(auth_service.generateAccessToken).toHaveBeenCalledWith({
-				user_id: userStub()._id,
+				user_id: user_stub._id,
 			});
 			expect(auth_service.generateRefreshToken).toHaveBeenCalledWith({
-				user_id: userStub()._id,
+				user_id: user_stub._id,
 			});
 			expect(auth_service.storeRefreshToken).toBeCalledWith(
-				userStub()._id,
-				refresh_token_stub,
+				user_stub._id,
+				mock_refresh_token,
 			);
 			expect(result).toEqual({
-				access_token: access_token_stub,
-				refresh_token: refresh_token_stub,
+				access_token: mock_access_token,
+				refresh_token: mock_refresh_token,
 			});
 		});
 	});
@@ -115,28 +116,29 @@ describe('AuthService', function () {
 	describe('signIn', () => {
 		it('should return access token and refresh token when given correct email and password', async () => {
 			// Arrange
+			const user_stub = createUserStub();
 			jest
 				.spyOn(auth_service, 'generateAccessToken')
-				.mockReturnValue(access_token_stub);
+				.mockReturnValue(mock_access_token);
 			jest
 				.spyOn(auth_service, 'generateRefreshToken')
-				.mockReturnValue(refresh_token_stub);
+				.mockReturnValue(mock_refresh_token);
 			jest
 				.spyOn(bcrypt, 'hash')
-				.mockImplementationOnce(() => refresh_token_stub);
+				.mockImplementationOnce(() => mock_refresh_token);
 			jest.spyOn(auth_service, 'storeRefreshToken');
 
 			// Act
-			const result = await auth_service.signIn(userStub()._id as string);
+			const result = await auth_service.signIn(user_stub._id as string);
 
 			// Assert
 			expect(auth_service.storeRefreshToken).toBeCalledWith(
-				userStub()._id,
-				refresh_token_stub,
+				user_stub._id,
+				mock_refresh_token,
 			);
 			expect(result).toEqual({
-				access_token: access_token_stub,
-				refresh_token: refresh_token_stub,
+				access_token: mock_access_token,
+				refresh_token: mock_refresh_token,
 			});
 		});
 	});
@@ -144,62 +146,65 @@ describe('AuthService', function () {
 	describe('generateAccessToken', () => {
 		it('should call jwtService.sign with the provided payload and configuration options', () => {
 			// Arrange
+			const user_stub = createUserStub();
 			// Act
 			const result = auth_service.generateAccessToken({
-				user_id: userStub()._id as string,
+				user_id: user_stub._id as string,
 			});
 
 			// Assert
 			expect(jwt_service.sign).toHaveBeenCalledWith(
-				{ user_id: userStub()._id },
+				{ user_id: user_stub._id },
 				expect.objectContaining({
 					algorithm: 'RS256',
 					privateKey: expect.any(String),
 					expiresIn: expect.any(String),
 				}),
 			);
-			expect(result).toBe(token_stub);
+			expect(result).toBe(mock_token);
 		});
 	});
 
 	describe('generateRefreshToken', () => {
 		it('should call jwtService.sign with the provided payload and configuration options', () => {
 			// Arrange
+			const user_stub = createUserStub();
 			// Act
 			const result = auth_service.generateRefreshToken({
-				user_id: userStub()._id as string,
+				user_id: user_stub._id as string,
 			});
 
 			// Assert
 			expect(jwt_service.sign).toBeCalledWith(
-				{ user_id: userStub()._id },
+				{ user_id: user_stub._id },
 				expect.objectContaining({
 					algorithm: 'RS256',
 					privateKey: expect.any(String),
 					expiresIn: expect.any(String),
 				}),
 			);
-			expect(result).toBe(token_stub);
+			expect(result).toBe(mock_token);
 		});
 	});
 
 	describe('storeRefreshToken', () => {
 		it('should call user_service.setCurrentRefreshToken to store refresh token into user database', async () => {
 			// Arrange
-			jest.spyOn(bcrypt, 'hash').mockImplementation(() => refresh_token_stub);
+			const user_stub = createUserStub();
+			jest.spyOn(bcrypt, 'hash').mockImplementation(() => mock_refresh_token);
 			// Act
 			await auth_service.storeRefreshToken(
-				userStub()._id as string,
-				refresh_token_stub,
+				user_stub._id as string,
+				mock_refresh_token,
 			);
 			// Assert
 			expect(bcrypt.hash).toBeCalledWith(
-				refresh_token_stub,
+				mock_refresh_token,
 				auth_service['SALT_ROUND'],
 			);
 			expect(users_service.setCurrentRefreshToken).toBeCalledWith(
-				userStub()._id,
-				refresh_token_stub,
+				user_stub._id,
+				mock_refresh_token,
 			);
 		});
 	});
@@ -207,7 +212,7 @@ describe('AuthService', function () {
 	describe('getAuthenticatedUser', () => {
 		it('should throw a bad request exception if email or password do not match', async () => {
 			// Arange
-			const user_stub = userStub();
+			const user_stub = createUserStub();
 			jest.spyOn(users_service, 'getUserByEmail').mockResolvedValueOnce(null);
 
 			// Act & Assert
@@ -219,7 +224,7 @@ describe('AuthService', function () {
 		it('should return user if email and password are valid', async () => {
 			// Arange
 			const user_stub = {
-				...userStub(),
+				...createUserStub(),
 				password: 'hashed_password',
 			};
 			const mock_raw_password = 'raw_password';
@@ -247,7 +252,7 @@ describe('AuthService', function () {
 	describe('getUserIfRefreshTokenMatched', () => {
 		it('should throw a not found exception if user id do not match', async () => {
 			// Arrange
-			const user_stub = userStub();
+			const user_stub = createUserStub();
 			jest
 				.spyOn(users_service, 'findOneByCondition')
 				.mockResolvedValueOnce(null);
@@ -256,14 +261,14 @@ describe('AuthService', function () {
 			await expect(
 				auth_service.getUserIfRefreshTokenMatched(
 					user_stub._id as string,
-					refresh_token_stub,
+					mock_refresh_token,
 				),
 			).rejects.toThrow(UnauthorizedException);
 		});
 		it('should throw a bad request exception if the refresh token does not match', async () => {
 			// Arange
 			const user_stub = {
-				...userStub(),
+				...createUserStub(),
 				current_refresh_token: 'hashed_refresh_token',
 			};
 			jest
@@ -275,14 +280,14 @@ describe('AuthService', function () {
 			await expect(
 				auth_service.getUserIfRefreshTokenMatched(
 					user_stub._id as string,
-					refresh_token_stub,
+					mock_refresh_token,
 				),
 			).rejects.toThrow(BadRequestException);
 		});
 		it('should return a user if the refresh token matches', async () => {
 			// Arange
 			const user_stub = {
-				...userStub(),
+				...createUserStub(),
 				current_refresh_token: 'hashed_refresh_token',
 			};
 			jest
@@ -298,13 +303,13 @@ describe('AuthService', function () {
 			await expect(
 				auth_service.getUserIfRefreshTokenMatched(
 					user_stub._id as string,
-					refresh_token_stub,
+					mock_refresh_token,
 				),
 			).resolves.toEqual(user_stub);
 			expect(
 				auth_service['verifyPlainContentWithHashedContent'],
 			).toHaveBeenCalledWith(
-				refresh_token_stub,
+				mock_refresh_token,
 				user_stub.current_refresh_token,
 			);
 		});
