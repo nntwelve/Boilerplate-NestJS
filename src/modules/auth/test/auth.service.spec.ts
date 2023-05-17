@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import {
 	BadRequestException,
 	ConflictException,
-	NotFoundException,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -15,16 +14,16 @@ import { UsersService } from '@modules/users/users.service';
 import { SignUpDto } from '../dto/sign-up.dto';
 
 // MOCK
-import { mockConfigService } from '../__mocks__/config.service';
-import { mockJwtService } from '../__mocks__/jwt.service';
-
-// STUB
-import { createUserStub } from '../../users/test/stubs/user.stub';
+import { mockConfigService } from './mocks/config-service.mock';
+import { mockJwtService } from './mocks/jwt.mock';
 import {
 	mock_access_token,
 	mock_refresh_token,
 	mock_token,
-} from './mocks/tokens.stub';
+} from './mocks/tokens.mock';
+
+// STUB
+import { createUserStub } from '../../users/test/stubs/user.stub';
 
 jest.mock('../../users/users.service');
 describe('AuthService', function () {
