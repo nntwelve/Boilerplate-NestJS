@@ -26,26 +26,26 @@ describe('AuthController', () => {
 		expect(auth_controller).toBeDefined();
 	});
 
-	// describe('signUp', () => {
-	// 	it('should create a new user and return an access token and refresh token', async () => {
-	// 		// Arrange
-	// 		const sign_up_dto = {
-	// 			first_name: 'John',
-	// 			last_name: 'Doe',
-	// 			email: 'johndoe@example.com',
-	// 			password: '1232@asdS',
-	// 		};
+	describe('signUp', () => {
+		it('should create a new user and return an access token and refresh token', async () => {
+			// Arrange
+			const sign_up_dto = {
+				first_name: 'John',
+				last_name: 'Doe',
+				email: 'johndoe@example.com',
+				password: '1232@asdS',
+			};
 
-	// 		// Act
-	// 		const response = await auth_controller.signUp(sign_up_dto);
+			// Act
+			const response = await auth_controller.signUp(sign_up_dto);
 
-	// 		// Assert
-	// 		expect(response).toEqual({
-	// 			access_token: mock_access_token,
-	// 			refresh_token: mock_refresh_token,
-	// 		});
-	// 	});
-	// });
+			// Assert
+			expect(response).toEqual({
+				access_token: mock_access_token,
+				refresh_token: mock_refresh_token,
+			});
+		});
+	});
 
 	describe('signIn', () => {
 		it('should be protected with LocalAuthGuard', () => {
@@ -65,32 +65,32 @@ describe('AuthController', () => {
 		});
 	});
 
-	// describe('refreshAccessToken', () => {
-	// 	// it('should be protected with JwtRefreshTokenGuard', () => {
-	// 	// 	expect(
-	// 	// 		isGuarded(
-	// 	// 			AuthController.prototype.refreshAccessToken,
-	// 	// 			JwtRefreshTokenGuard,
-	// 	// 		),
-	// 	// 	);
-	// 	// });
-	// 	it('should refresh the access token for a user and return a new access token', async () => {
-	// 		// Arrange
-	// 		const request = {
-	// 			user: {
-	// 				_id: 'user_id',
-	// 			},
-	// 		};
+	describe('refreshAccessToken', () => {
+		// it('should be protected with JwtRefreshTokenGuard', () => {
+		// 	expect(
+		// 		isGuarded(
+		// 			AuthController.prototype.refreshAccessToken,
+		// 			JwtRefreshTokenGuard,
+		// 		),
+		// 	);
+		// });
+		it('should refresh the access token for a user and return a new access token', async () => {
+			// Arrange
+			const request = {
+				user: {
+					_id: 'user_id',
+				},
+			};
 
-	// 		// Act
-	// 		const response = await auth_controller.refreshAccessToken(
-	// 			request as RequestWithUser,
-	// 		);
+			// Act
+			const response = await auth_controller.refreshAccessToken(
+				request as RequestWithUser,
+			);
 
-	// 		// Assert
-	// 		expect(response).toEqual({
-	// 			access_token: mock_access_token,
-	// 		});
-	// 	});
-	// });
+			// Assert
+			expect(response).toEqual({
+				access_token: mock_access_token,
+			});
+		});
+	});
 });
