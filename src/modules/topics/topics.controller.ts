@@ -19,11 +19,13 @@ import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-
 import { Topic } from './entities/topic.entity';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 
 @Controller('topics')
 @ApiTags('topics')
 // @UseGuards(JwtAccessTokenGuard)
 @UseInterceptors(MongooseClassSerializerInterceptor(Topic))
+@UseInterceptors(LoggingInterceptor)
 export class TopicsController {
 	constructor(private readonly topicsService: TopicsService) {}
 
