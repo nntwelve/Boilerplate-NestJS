@@ -6,7 +6,7 @@ export const execution_context: ExecutionContext = {
 	getArgs: jest.fn(),
 	getType: jest.fn(),
 	getArgByIndex: jest.fn(),
-	switchToHttp: jest.fn(),
+	switchToHttp: jest.fn().mockReturnValue({ getRequest: jest.fn() }),
 	switchToRpc: jest.fn(),
 	switchToWs: jest.fn(),
 };
