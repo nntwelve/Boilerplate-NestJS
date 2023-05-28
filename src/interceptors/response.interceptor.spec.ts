@@ -1,5 +1,5 @@
 import { CallHandler } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { ResponseInterceptor } from './response.interceptor';
 import { execution_context } from 'src/shared/test/mocks/execution-context.mock';
 
@@ -44,6 +44,31 @@ describe('ResponseInterceptor', () => {
 				},
 				error: (error) => {
 					console.log(error);
+				},
+				complete: () => {
+					done();
+				},
+			});
+		});
+		it('should handle errors thrown by the handler', (done) => {
+			// Arrange
+			const error = new Error('Something went wrong');
+			(next.handle as jest.Mock).mockImplementationOnce(() => {
+				return throwError(() => error);
+			});
+
+			// Act
+			const response_interceptor: Observable<any> = interceptor.intercept(
+				execution_context,
+				next,
+			);
+
+			// Assert
+			response_interceptor.subscribe({
+				next: () => {},
+				error: (err) => {
+					expect(err).toBe(error);
+					done();
 				},
 				complete: () => {
 					done();
