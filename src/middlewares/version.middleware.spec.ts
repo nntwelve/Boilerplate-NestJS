@@ -73,7 +73,9 @@ describe('VersionMiddleware', () => {
 			// Act & Assert
 			// We must wrap `middleware.use` inside anonymous function because when a function is invoked directly like middleware.use(req, res, next),
 			// its exceptions are propagated up the stack trace instead of being caught by Jest's expect statement.
-			expect(() => middleware.use(req, res, next)).toThrow(BadRequestException);
+			expect(() => middleware.use(req, res, next)).toThrowError(
+				new BadRequestException('Invalid App Version'),
+			);
 		});
 	});
 });
