@@ -65,7 +65,7 @@ describe('ResponseInterceptor', () => {
 
 			// Assert
 			response_interceptor.subscribe({
-				next: () => {},
+				next: () => console.log, // Do nothing
 				error: (err) => {
 					expect(err).toBe(error);
 					done();
