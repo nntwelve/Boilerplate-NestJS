@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { VersionMiddleware } from './version.middleware';
 import { BadRequestException } from '@nestjs/common';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('VersionMiddleware', () => {
 	let middleware: VersionMiddleware;
@@ -12,8 +13,8 @@ describe('VersionMiddleware', () => {
 		middleware = new VersionMiddleware();
 
 		next = jest.fn();
-		req = {} as Request;
-		res = {} as Response;
+		req = createMock<Request>();
+		res = createMock<Response>();
 	});
 
 	describe('use', () => {
