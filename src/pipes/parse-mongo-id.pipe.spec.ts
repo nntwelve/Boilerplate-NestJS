@@ -33,13 +33,9 @@ describe('ParseMongoIdPipe', () => {
 			);
 			expect(() => pipe.transform('invalid-id')).toThrowError('Invalid ID');
 			expect(() => pipe.transform(123)).toThrowError(BadRequestException);
-			expect(() => pipe.transform(123)).toThrowError(
-				new BadRequestException('Invalid ID'),
-			);
+			expect(() => pipe.transform(123)).toThrowError('Invalid ID');
 			expect(() => pipe.transform({})).toThrowError(BadRequestException);
-			expect(() => pipe.transform({})).toThrowError(
-				new BadRequestException('Invalid ID'),
-			);
+			expect(() => pipe.transform({})).toThrowError('Invalid ID');
 		});
 	});
 });
