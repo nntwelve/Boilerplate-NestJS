@@ -26,8 +26,8 @@ describe('JwtAccessTokenGuard', () => {
 		reflector = moduleRef.get<Reflector>(Reflector);
 	});
 
-	beforeEach(() => {
-		jest.resetAllMocks();
+	afterEach(() => {
+		jest.clearAllMocks();
 	});
 
 	it('should return true when isPublic is true', () => {
