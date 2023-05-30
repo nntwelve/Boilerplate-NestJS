@@ -28,16 +28,16 @@ describe('ResponseInterceptor', () => {
 				message: 'Success',
 				data: return_data,
 			};
-			const response_interceptor: Observable<any> = interceptor.intercept(
-				execution_context,
-				next,
-			);
 
 			// Act & Assert
 			// if your interceptor has logic that depends on the context
 			// you can always pass in a mock value instead of an empty object
 			// just make sure to mock the expected alls like switchToHttp
 			// and getRequest
+			const response_interceptor: Observable<any> = interceptor.intercept(
+				execution_context,
+				next,
+			);
 			response_interceptor.subscribe({
 				next: (data) => {
 					expect(data).toEqual(expected_data);
