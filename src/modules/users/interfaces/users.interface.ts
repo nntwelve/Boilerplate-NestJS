@@ -6,7 +6,11 @@ export interface UsersRepositoryInterface
 	extends BaseRepositoryInterface<User> {
 	findAllWithSubFields(
 		condition: object,
-		projection?: string,
-		populate?: string[] | any,
+		options: {
+			projection?: string;
+			populate?: string[] | any;
+			offset?: number;
+			limit?: number;
+		},
 	): Promise<FindAllResponse<User>>;
 }

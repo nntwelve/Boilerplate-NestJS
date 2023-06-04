@@ -13,21 +13,28 @@ export class UsersRepository
 {
 	constructor(
 		@InjectModel(User.name)
-		private readonly users_repository: Model<UserDocument>,
+		private readonly user_model: Model<UserDocument>,
 	) {
-		super(users_repository);
+		super(user_model);
 	}
 
 	async findAllWithSubFields(
 		condition: FilterQuery<UserDocument>,
-		projection?: string,
-		populate?: string[] | PopulateOptions | PopulateOptions[],
+		options: {
+			projection?: string;
+			populate?: string[] | PopulateOptions | PopulateOptions[];
+			offset?: number;
+			limit?: number;
+		},
 	): Promise<FindAllResponse<UserDocument>> {
 		const [count, items] = await Promise.all([
-			this.users_repository.count({ ...condition, deleted_at: null }),
-			this.users_repository
-				.find({ ...condition, deleted_at: null }, projection)
-				.populate(populate),
+			this.user_model.count({ ...condition, deleted_at: null }),
+			this.user_model
+				.find({ ...condition, deleted_at: null }, options?.projection || '', {
+					skip: options.offset || 0,
+					limit: options.limit || 10,
+				})
+				.populate(options.populate),
 		]);
 		return {
 			count,
