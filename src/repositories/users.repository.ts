@@ -21,14 +21,21 @@ export class UsersRepository
 
 	async findAllWithSubFields(
 		condition: FilterQuery<UserDocument>,
-		projection?: string,
-		populate?: string[] | PopulateOptions | PopulateOptions[],
+		options: {
+			projection?: string;
+			populate?: string[] | PopulateOptions | PopulateOptions[];
+			offset?: number;
+			limit?: number;
+		},
 	): Promise<FindAllResponse<UserDocument>> {
 		const [count, items] = await Promise.all([
 			this.user_model.count({ ...condition, deleted_at: null }),
 			this.user_model
-				.find({ ...condition, deleted_at: null }, projection)
-				.populate(populate),
+				.find({ ...condition, deleted_at: null }, options?.projection || '', {
+					skip: options.offset || 0,
+					limit: options.limit || 10,
+				})
+				.populate(options.populate),
 		]);
 		return {
 			count,
