@@ -15,8 +15,12 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 		return created_data.save();
 	}
 
-	async findOneById(id: string): Promise<T> {
-		const item = await this.model.findById(id);
+	async findOneById(
+		id: string,
+		projection?: string,
+		options?: QueryOptions<T>,
+	): Promise<T> {
+		const item = await this.model.findById(id, projection, options);
 		return item.deleted_at ? null : item;
 	}
 

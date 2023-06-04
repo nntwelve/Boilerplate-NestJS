@@ -13,4 +13,5 @@ export interface UsersRepositoryInterface
 			limit?: number;
 		},
 	): Promise<FindAllResponse<User>>;
+	getUserWithRole(user_id: string): Promise<User>;
 }

@@ -15,8 +15,8 @@ export class CollectionRepository
 {
 	constructor(
 		@InjectModel(Collection.name)
-		private readonly collection_repository: Model<CollectionDocument>,
+		private readonly collection_model: Model<CollectionDocument>,
 	) {
-		super(collection_repository);
+		super(collection_model);
 	}
 }

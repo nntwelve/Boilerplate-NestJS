@@ -89,9 +89,9 @@ export class User extends BaseEntity {
 	})
 	username: string;
 
+	@Exclude()
 	@Prop({
 		required: true,
-		select: false,
 	})
 	password: string;
 
@@ -140,6 +140,10 @@ export class User extends BaseEntity {
 	stripe_customer_id: string;
 
 	default_address?: string;
+
+	@Prop()
+	@Exclude()
+	current_refresh_token: string;
 
 	@Expose({ name: 'full_name' })
 	get fullName(): string {

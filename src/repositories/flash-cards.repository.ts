@@ -15,8 +15,8 @@ export class FlashCardsRepository
 {
 	constructor(
 		@InjectModel(FlashCard.name)
-		private readonly flash_cards_repository: Model<FlashCardDocument>,
+		private readonly flash_card_model: Model<FlashCardDocument>,
 	) {
-		super(flash_cards_repository);
+		super(flash_card_model);
 	}
 }

@@ -17,6 +17,6 @@ export class CreateFlashCardDto {
 	@IsOptional()
 	pronunciation: string;
 
-	@IsNotEmpty()
+	// @IsNotEmpty()
 	user?: User;
 }

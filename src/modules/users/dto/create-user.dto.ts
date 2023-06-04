@@ -34,7 +34,7 @@ export class CreateUserDto {
 
 	@IsOptional()
 	// @IsPhoneNumber()
-	phone_number: string;
+	phone_number?: string;
 
 	@IsNotEmpty()
 	@IsStrongPassword()
@@ -51,5 +51,5 @@ export class CreateUserDto {
 	@IsArray()
 	@ArrayMinSize(1)
 	@IsEnum(LANGUAGES, { each: true })
-	interested_languages: LANGUAGES[];
+	interested_languages?: LANGUAGES[];
 }

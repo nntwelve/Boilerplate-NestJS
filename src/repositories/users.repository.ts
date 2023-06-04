@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PopulateOptions } from 'mongoose';
 import { BaseRepositoryAbstract } from './base/base.abstract.repository';
 import { FindAllResponse } from 'src/types/common.type';
+import { UserRole } from '@modules/user-roles/entities/user-role.entity';
 
 @Injectable()
 export class UsersRepository
@@ -40,5 +41,11 @@ export class UsersRepository
 			count,
 			items,
 		};
+	}
+
+	async getUserWithRole(user_id: string): Promise<User> {
+		return await this.user_model
+			.findById(user_id, '-password')
+			.populate([{ path: 'role', transform: (role: UserRole) => role?.name }]);
 	}
 }

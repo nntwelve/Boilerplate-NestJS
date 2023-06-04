@@ -15,8 +15,8 @@ export class UserRolesRepository
 {
 	constructor(
 		@InjectModel(UserRole.name)
-		private readonly user_roles_repository: Model<UserRoleDocument>,
+		private readonly user_role_model: Model<UserRoleDocument>,
 	) {
-		super(user_roles_repository);
+		super(user_role_model);
 	}
 }
