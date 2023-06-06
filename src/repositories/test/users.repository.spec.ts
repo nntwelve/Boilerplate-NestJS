@@ -1,11 +1,14 @@
-import { UserDocument } from '@modules/users/entities/user.entity';
-import { User } from '@modules/users/entities/user.entity';
-import { createUserStub } from '@modules/users/test/stubs/user.stub';
+import { FilterQuery, Model } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-import { UsersRepository } from '@repositories/users.repository';
-import { FilterQuery, Model } from 'mongoose';
+
+// OUTER
 import { PaginateParams } from 'src/types/common.type';
+
+// INNER
+import { UserDocument, User } from '@modules/users/entities/user.entity';
+import { createUserStub } from '@modules/users/test/stubs/user.stub';
+import { UsersRepository } from '@repositories/users.repository';
 import { UserEntity } from './supports/user.entity';
 
 describe('UsersRepository', () => {
