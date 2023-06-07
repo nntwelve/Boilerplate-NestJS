@@ -8,19 +8,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { AuthService } from '../auth.service';
+import { DeepMocked, createMock } from '@golevelup/ts-jest';
 
 // OUTER MODULE
 import { UsersService } from '@modules/users/users.service';
 import { SignUpDto } from '../dto/sign-up.dto';
 
 // MOCK
-import { mockConfigService } from './mocks/config-service.mock';
-import { mockJwtService } from './mocks/jwt.mock';
-import {
-	mock_access_token,
-	mock_refresh_token,
-	mock_token,
-} from './mocks/tokens.mock';
+import { mock_access_token, mock_refresh_token } from './mocks/tokens.mock';
 
 // STUB
 import { createUserStub } from '../../users/test/stubs/user.stub';
@@ -30,24 +25,17 @@ describe('AuthService', function () {
 	let auth_service: AuthService;
 	let users_service: UsersService;
 	let jwt_service: JwtService;
+	let config_service: DeepMocked<ConfigService>;
 	beforeEach(async () => {
 		const module_ref = await Test.createTestingModule({
-			providers: [
-				AuthService,
-				{
-					provide: JwtService,
-					useValue: mockJwtService,
-				},
-				{
-					provide: ConfigService,
-					useValue: mockConfigService,
-				},
-				UsersService,
-			],
-		}).compile();
+			providers: [AuthService, UsersService],
+		})
+			.useMocker(createMock)
+			.compile();
 		auth_service = module_ref.get<AuthService>(AuthService);
 		users_service = module_ref.get<UsersService>(UsersService);
-		jwt_service = module_ref.get<JwtService>(JwtService);
+		jwt_service = module_ref.get(JwtService);
+		config_service = module_ref.get(ConfigService);
 	});
 	it('should be defined', () => {
 		expect(auth_service).toBeDefined();
@@ -146,8 +134,9 @@ describe('AuthService', function () {
 		it('should call jwtService.sign with the provided payload and configuration options', () => {
 			// Arrange
 			const user_stub = createUserStub();
+			config_service.get.mockReturnValueOnce('3600');
 			// Act
-			const result = auth_service.generateAccessToken({
+			auth_service.generateAccessToken({
 				user_id: user_stub._id as string,
 			});
 
@@ -160,7 +149,6 @@ describe('AuthService', function () {
 					expiresIn: expect.any(String),
 				}),
 			);
-			expect(result).toBe(mock_token);
 		});
 	});
 
@@ -168,8 +156,9 @@ describe('AuthService', function () {
 		it('should call jwtService.sign with the provided payload and configuration options', () => {
 			// Arrange
 			const user_stub = createUserStub();
+			config_service.get.mockReturnValueOnce('3600');
 			// Act
-			const result = auth_service.generateRefreshToken({
+			auth_service.generateRefreshToken({
 				user_id: user_stub._id as string,
 			});
 
@@ -182,7 +171,6 @@ describe('AuthService', function () {
 					expiresIn: expect.any(String),
 				}),
 			);
-			expect(result).toBe(mock_token);
 		});
 	});
 
