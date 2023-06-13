@@ -12,5 +12,6 @@ export const createUserStub = (): User => {
 		gender: GENDER.MALE,
 		role: 'admin' as unknown as UserRole,
 		fullName: 'John Doe',
+		point: 0,
 	};
 };

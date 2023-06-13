@@ -11,6 +11,7 @@ import { CollectionDocument } from '@modules/collections/entities/collection.ent
 
 // INNER
 import { Address, AddressSchema } from './address.entity';
+import { DailyCheckIn, DailyCheckInSchema } from './daily-check-in.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -178,6 +179,18 @@ export class User extends BaseEntity {
 	@Prop()
 	@Exclude()
 	current_refresh_token?: string;
+
+	@Prop({
+		type: [DailyCheckInSchema],
+	})
+	@Type(() => DailyCheckIn)
+	daily_check_in?: DailyCheckIn[];
+
+	@Prop()
+	last_check_in?: Date;
+
+	@Prop()
+	last_get_check_in_rewards?: Date;
 
 	@Expose({ name: 'full_name' })
 	get fullName(): string {

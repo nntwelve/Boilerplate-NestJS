@@ -9,7 +9,7 @@ import { UserRole } from '@modules/user-roles/entities/user-role.entity';
 
 @Injectable()
 export class UsersRepository
-	extends BaseRepositoryAbstract<UserDocument>
+	extends BaseRepositoryAbstract<User>
 	implements UsersRepositoryInterface
 {
 	constructor(
