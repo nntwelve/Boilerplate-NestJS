@@ -6,7 +6,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserRolesService } from '@modules/user-roles/user-roles.service';
 import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
 import { FindAllResponse } from 'src/types/common.type';
-import { isLastDayOfMonth } from 'src/shared/helpers/date.helper';
+import {
+	isDifferentMonthOrYear,
+	isLastDayOfMonth,
+	isTheMonthOfSameYear,
+} from 'src/shared/helpers/date.helper';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -87,9 +91,9 @@ export class UsersService extends BaseServiceAbstract<User> {
 				? new Date(date_for_testing)
 				: new Date();
 			const { daily_check_in } = user;
-			// TH1
+			// Case 1
 			if (!daily_check_in?.length) {
-				// TH1.1:
+				// Case 1.1:
 				if (isLastDayOfMonth(check_in_time)) {
 					return await this.users_repository.update(user._id.toString(), {
 						point: user.point + 1,
@@ -100,7 +104,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 						last_get_check_in_rewards: check_in_time,
 					});
 				}
-				// TH1.2:
+				// Case 1.2:
 				return await this.users_repository.update(user._id.toString(), {
 					daily_check_in: [
 						{ eligible_for_reward: false, checked_date: check_in_time },
@@ -113,7 +117,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 						check_in_data.checked_date.toDateString() ===
 						check_in_time.toDateString(),
 				);
-				// TH2.1:
+				// Case 2.1:
 				if (already_check_in_index !== -1) {
 					return await this.users_repository.update(user._id.toString(), {
 						daily_check_in: [
@@ -128,26 +132,25 @@ export class UsersService extends BaseServiceAbstract<User> {
 						last_check_in: check_in_time,
 					});
 				}
-				// TH 2.2
-				// TH 2.2.1
+				// Case 2.2
+				// Case 2.2.1
 				if (isLastDayOfMonth(check_in_time)) {
-					//TH 2.2.1.1
+					//Case 2.2.1.1
 					if (
-						(user.last_get_check_in_rewards.getMonth() !==
-							user.last_check_in.getMonth() ||
-							user.last_get_check_in_rewards.getFullYear() !==
-								user.last_check_in.getFullYear()) &&
-						(user.last_check_in.getFullYear() !== check_in_time.getFullYear() ||
-							user.last_check_in.getMonth() !== check_in_time.getMonth())
+						isDifferentMonthOrYear(
+							user.last_get_check_in_rewards,
+							user.last_check_in,
+						) &&
+						isDifferentMonthOrYear(user.last_check_in, check_in_time)
 					) {
 						const { previous_month_data, current_month_data } =
 							daily_check_in.reduce(
 								(result, check_in_data) => {
 									if (
-										check_in_data.checked_date.getFullYear() ===
-											user.last_check_in.getFullYear() &&
-										check_in_data.checked_date.getMonth() ===
-											user.last_check_in.getMonth()
+										isTheMonthOfSameYear(
+											check_in_data.checked_date,
+											user.last_check_in,
+										)
 									) {
 										return {
 											...result,
@@ -158,10 +161,10 @@ export class UsersService extends BaseServiceAbstract<User> {
 										};
 									}
 									if (
-										check_in_data.checked_date.getFullYear() ===
-											check_in_time.getFullYear() &&
-										check_in_data.checked_date.getMonth() ===
-											check_in_time.getMonth()
+										isTheMonthOfSameYear(
+											check_in_data.checked_date,
+											check_in_time,
+										)
 									) {
 										return {
 											...result,
@@ -192,15 +195,11 @@ export class UsersService extends BaseServiceAbstract<User> {
 							point: user.point + previous_month_point + current_month_point,
 						});
 					}
-					// TH 2.2.1.2
+					// Case 2.2.1.2
 					const current_month_point =
 						1 +
-						daily_check_in.filter(
-							(check_in_data) =>
-								check_in_data.checked_date.getFullYear() ===
-									check_in_time.getFullYear() &&
-								check_in_data.checked_date.getMonth() ===
-									check_in_time.getMonth(),
+						daily_check_in.filter((check_in_data) =>
+							isTheMonthOfSameYear(check_in_data.checked_date, check_in_time),
 						).length;
 					return await this.users_repository.update(user._id.toString(), {
 						last_check_in: check_in_time,
@@ -215,23 +214,20 @@ export class UsersService extends BaseServiceAbstract<User> {
 						point: user.point + current_month_point,
 					});
 				}
-				// TH 2.2.2.1
+				// Case 2.2.2.1
 				if (
-					(user.last_get_check_in_rewards.getMonth() !==
-						user.last_check_in.getMonth() ||
-						user.last_get_check_in_rewards.getFullYear() !==
-							user.last_check_in.getFullYear()) &&
-					(user.last_check_in.getFullYear() !== check_in_time.getFullYear() ||
-						user.last_check_in.getMonth() !== check_in_time.getMonth())
+					isDifferentMonthOrYear(
+						user.last_get_check_in_rewards,
+						user.last_check_in,
+					) &&
+					isDifferentMonthOrYear(user.last_check_in, check_in_time)
 				) {
-					const previous_month_point =
-						daily_check_in.filter(
-							(check_in_data) =>
-								check_in_data.checked_date.getFullYear() ===
-									user.last_check_in.getFullYear() &&
-								check_in_data.checked_date.getMonth() ===
-									user.last_check_in.getMonth(),
-						) || [];
+					const previous_month_point = daily_check_in.filter((check_in_data) =>
+						isTheMonthOfSameYear(
+							check_in_data.checked_date,
+							user.last_check_in,
+						),
+					).length;
 					return await this.users_repository.update(user._id.toString(), {
 						last_check_in: check_in_time,
 						last_get_check_in_rewards: check_in_time,
@@ -242,10 +238,10 @@ export class UsersService extends BaseServiceAbstract<User> {
 								checked_date: check_in_time,
 							},
 						],
-						point: user.point + previous_month_point.length,
+						point: user.point + previous_month_point,
 					});
 				}
-				// TH 2.2.2.2
+				// Case 2.2.2.2
 				return await this.users_repository.update(user._id.toString(), {
 					last_check_in: check_in_time,
 					daily_check_in: [

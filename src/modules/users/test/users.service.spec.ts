@@ -40,15 +40,6 @@ describe('UserService', () => {
 				const user = createUserStub();
 				const testing_date = '2023-01-31';
 				const check_in_time = new Date(testing_date);
-				jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-					Promise.resolve({
-						...user,
-						daily_check_in: [{ eligible_for_reward: true }],
-						last_check_in: check_in_time,
-						last_get_check_in_rewards: check_in_time,
-						point: user.point + 1,
-					} as unknown as User),
-				);
 
 				// Act
 				await users_service.updateDailyCheckIn(user, testing_date);
@@ -70,20 +61,6 @@ describe('UserService', () => {
 				const testing_date = '2023-01-15:12:12:12';
 				const check_in_time = new Date(testing_date);
 				const user = createUserStub();
-				jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-					Promise.resolve({
-						...user,
-						daily_check_in: [
-							{
-								eligible_for_reward: false,
-								access_amount: 1,
-								reward_days_count: 1,
-								checked_date: check_in_time,
-							},
-						],
-						last_check_in: check_in_time,
-					} as unknown as User),
-				);
 
 				// Act
 				await users_service.updateDailyCheckIn(user, testing_date);
@@ -117,20 +94,10 @@ describe('UserService', () => {
 				} as unknown as User;
 				const testing_date = '2023-01-31:15:00:00';
 				const check_in_date = new Date(testing_date);
-				jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-					Promise.resolve({
-						...user,
-						daily_check_in: [
-							{
-								...user.daily_check_in[0],
-								access_amount: user.daily_check_in[0].access_amount + 1,
-							},
-						],
-						last_check_in: check_in_date,
-					} as unknown as User),
-				);
+
 				// Act
 				await users_service.updateDailyCheckIn(user, testing_date);
+
 				// Assert
 				expect(users_repository.update).toBeCalledWith(user._id, {
 					daily_check_in: [
@@ -167,23 +134,6 @@ describe('UserService', () => {
 						} as unknown as User;
 						const testing_date = '2023-02-28:15:00:00';
 						const check_in_date = new Date(testing_date);
-						jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-							Promise.resolve({
-								...user,
-								point: user.point + 3, // 3 point for three days: 2023-01-10, 2023-01-15, 2023-02-28
-								daily_check_in: [
-									...user.daily_check_in,
-									{
-										checked_date: check_in_date,
-										access_amount: 1,
-										reward_days_count: 1,
-										eligible_for_reward: true,
-									},
-								],
-								last_check_in: check_in_date,
-								last_get_check_in_rewards: check_in_date,
-							} as unknown as User),
-						);
 
 						// Act
 						await users_service.updateDailyCheckIn(user, testing_date);
@@ -228,23 +178,6 @@ describe('UserService', () => {
 						} as unknown as User;
 						const testing_date = '2023-02-28:15:00:00';
 						const check_in_date = new Date(testing_date);
-						jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-							Promise.resolve({
-								...user,
-								point: user.point + 1, // only 1 point for 2023-02-28
-								daily_check_in: [
-									...user.daily_check_in,
-									{
-										checked_date: check_in_date,
-										access_amount: 1,
-										reward_days_count: 1,
-										eligible_for_reward: true,
-									},
-								],
-								last_check_in: check_in_date,
-								last_get_check_in_rewards: check_in_date,
-							} as unknown as User),
-						);
 
 						// Act
 						await users_service.updateDailyCheckIn(user, testing_date);
@@ -286,21 +219,6 @@ describe('UserService', () => {
 						} as unknown as User;
 						const testing_date = '2023-02-28:15:11:00';
 						const check_in_date = new Date(testing_date);
-						jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-							Promise.resolve({
-								...user,
-								daily_check_in: [
-									...user.daily_check_in,
-									{
-										checked_date: check_in_date,
-										access_amount: 1,
-										reward_days_count: 2,
-										eligible_for_reward: true,
-									},
-								],
-								last_check_in: check_in_date,
-							} as unknown as User),
-						);
 
 						// Act
 						await users_service.updateDailyCheckIn(user, testing_date);
@@ -344,23 +262,6 @@ describe('UserService', () => {
 						} as unknown as User;
 						const testing_date = '2023-02-11:15:00:00';
 						const check_in_date = new Date(testing_date);
-						jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-							Promise.resolve({
-								...user,
-								point: user.point + 2, // 2 point for 2023-01-15 and 2023-01-22
-								daily_check_in: [
-									...user.daily_check_in,
-									{
-										checked_date: check_in_date,
-										access_amount: 1,
-										reward_days_count: 1,
-										eligible_for_reward: false,
-									},
-								],
-								last_check_in: check_in_date,
-								last_get_check_in_rewards: check_in_date,
-							} as unknown as User),
-						);
 
 						// Act
 						await users_service.updateDailyCheckIn(user, testing_date);
@@ -396,21 +297,6 @@ describe('UserService', () => {
 						} as unknown as User;
 						const testing_date = '2023-02-11:15:00:00';
 						const check_in_date = new Date(testing_date);
-						jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-							Promise.resolve({
-								...user,
-								daily_check_in: [
-									...user.daily_check_in,
-									{
-										checked_date: check_in_date,
-										access_amount: 1,
-										reward_days_count: 1,
-										eligible_for_reward: false,
-									},
-								],
-								last_check_in: check_in_date,
-							} as unknown as User),
-						);
 
 						// Act
 						await users_service.updateDailyCheckIn(user, testing_date);
@@ -451,21 +337,6 @@ describe('UserService', () => {
 						} as unknown as User;
 						const testing_date = '2023-02-11:15:00:00';
 						const check_in_date = new Date(testing_date);
-						jest.spyOn(users_repository, 'update').mockImplementationOnce(() =>
-							Promise.resolve({
-								...user,
-								daily_check_in: [
-									...user.daily_check_in,
-									{
-										checked_date: check_in_date,
-										access_amount: 1,
-										reward_days_count: 2,
-										eligible_for_reward: false,
-									},
-								],
-								last_check_in: check_in_date,
-							} as unknown as User),
-						);
 
 						// Act
 						await users_service.updateDailyCheckIn(user, testing_date);
