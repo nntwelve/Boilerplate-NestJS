@@ -11,6 +11,7 @@ import {
 	isLastDayOfMonth,
 	isTheMonthOfSameYear,
 } from 'src/shared/helpers/date.helper';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -18,6 +19,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 		@Inject('UsersRepositoryInterface')
 		private readonly users_repository: UsersRepositoryInterface,
 		private readonly user_roles_service: UserRolesService,
+		private readonly config_service: ConfigService,
 	) {
 		super(users_repository);
 	}
@@ -87,9 +89,10 @@ export class UsersService extends BaseServiceAbstract<User> {
 	): Promise<User> {
 		try {
 			// Assume for all reward of this API: corresponding one check-in day will get one point
-			const check_in_time = date_for_testing
-				? new Date(date_for_testing)
-				: new Date();
+			const check_in_time =
+				this.config_service.get('NODE_ENV') === 'production'
+					? new Date()
+					: new Date(date_for_testing);
 			const { daily_check_in } = user;
 			// Case 1
 			if (!daily_check_in?.length) {

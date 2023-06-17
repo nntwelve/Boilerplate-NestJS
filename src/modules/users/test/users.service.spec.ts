@@ -6,6 +6,7 @@ import { UsersRepositoryInterface } from '../interfaces/users.interface';
 import { UsersRepository } from '@repositories/users.repository';
 import { User } from '../entities/user.entity';
 import { createUserStub } from './stubs/user.stub';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('../../user-roles/user-roles.service.ts');
 describe('UserService', () => {
@@ -19,6 +20,10 @@ describe('UserService', () => {
 				{
 					provide: 'UsersRepositoryInterface',
 					useValue: createMock<UsersRepositoryInterface>(),
+				},
+				{
+					provide: ConfigService,
+					useValue: createMock<ConfigService>(),
 				},
 			],
 		}).compile();
