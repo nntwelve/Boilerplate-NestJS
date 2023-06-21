@@ -1,17 +1,22 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
+import { ConfigService } from '@nestjs/config';
+
+// INNER
 import { User } from './entities/user.entity';
 import { UsersRepositoryInterface } from './interfaces/users.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserRolesService } from '@modules/user-roles/user-roles.service';
+
+// OUTER
 import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
+import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
+import { UserRolesService } from '@modules/user-roles/user-roles.service';
 import { FindAllResponse } from 'src/types/common.type';
 import {
 	isDifferentMonthOrYear,
 	isLastDayOfMonth,
-	isTheMonthOfSameYear,
 } from 'src/shared/helpers/date.helper';
-import { ConfigService } from '@nestjs/config';
+
+import { DailyCheckInService } from '@modules/daily-check-in/daily-check-in.service';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -19,6 +24,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 		@Inject('UsersRepositoryInterface')
 		private readonly users_repository: UsersRepositoryInterface,
 		private readonly user_roles_service: UserRolesService,
+		private readonly daily_check_in_service: DailyCheckInService,
 		private readonly config_service: ConfigService,
 	) {
 		super(users_repository);
@@ -85,7 +91,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 
 	async updateDailyCheckIn(
 		user: User,
-		date_for_testing: string,
+		date_for_testing = new Date(),
 	): Promise<User> {
 		try {
 			// Assume for all reward of this API: corresponding one check-in day will get one point
@@ -96,164 +102,135 @@ export class UsersService extends BaseServiceAbstract<User> {
 			const { daily_check_in } = user;
 			// Case 1
 			if (!daily_check_in?.length) {
-				// Case 1.1:
+				// Case 1.1: PASS
 				if (isLastDayOfMonth(check_in_time)) {
-					return await this.users_repository.update(user._id.toString(), {
-						point: user.point + 1,
+					const check_in_data = [
+						{ eligible_for_reward: true, checked_date: check_in_time },
+					];
+					const [updated_user] = await Promise.all([
+						this.users_repository.update(user._id.toString(), {
+							point: user.point + 1,
+							daily_check_in: check_in_data,
+							last_check_in: check_in_time,
+							last_get_check_in_rewards: check_in_time,
+						}),
+						this.daily_check_in_service.create({
+							user,
+							month_year: `${
+								check_in_time.getMonth() + 1
+							}-${check_in_time.getFullYear()}`,
+							check_in_data,
+						}),
+					]);
+					return updated_user;
+				}
+				// Case 1.2: PASS
+				const [updated_user] = await Promise.all([
+					await this.users_repository.update(user._id.toString(), {
 						daily_check_in: [
-							{ eligible_for_reward: true, checked_date: check_in_time },
+							{ eligible_for_reward: false, checked_date: check_in_time },
 						],
 						last_check_in: check_in_time,
-						last_get_check_in_rewards: check_in_time,
-					});
-				}
-				// Case 1.2:
-				return await this.users_repository.update(user._id.toString(), {
-					daily_check_in: [
-						{ eligible_for_reward: false, checked_date: check_in_time },
-					],
-					last_check_in: check_in_time,
-				});
-			} else {
-				const already_check_in_index = daily_check_in.findIndex(
-					(check_in_data) =>
-						check_in_data.checked_date.toDateString() ===
-						check_in_time.toDateString(),
-				);
-				// Case 2.1:
-				if (already_check_in_index !== -1) {
-					return await this.users_repository.update(user._id.toString(), {
-						daily_check_in: [
-							...daily_check_in.slice(0, already_check_in_index),
-							{
-								...user.daily_check_in[already_check_in_index],
-								access_amount:
-									daily_check_in[already_check_in_index].access_amount + 1,
-							},
-							...daily_check_in.slice(already_check_in_index + 1),
+					}),
+					this.daily_check_in_service.create({
+						user,
+						month_year: `${
+							check_in_time.getMonth() + 1
+						}-${check_in_time.getFullYear()}`,
+						check_in_data: [
+							{ eligible_for_reward: false, checked_date: check_in_time },
 						],
+					}),
+				]);
+				return updated_user;
+			} else {
+				// Case 2.1: PASS
+				if (
+					user.last_check_in.toDateString() === check_in_time.toDateString()
+				) {
+					// Spread operator will lead to error with mongoose document, please careful
+					const current_daily_check_in =
+						await this.daily_check_in_service.increaseAccessAmount(
+							user._id.toString(),
+							check_in_time,
+						);
+					return await this.users_repository.update(user._id.toString(), {
+						daily_check_in: current_daily_check_in.check_in_data,
 						last_check_in: check_in_time,
 					});
 				}
 				// Case 2.2
 				// Case 2.2.1
 				if (isLastDayOfMonth(check_in_time)) {
-					//Case 2.2.1.1
+					// Case 2.2.1.1: PASS
 					if (
-						isDifferentMonthOrYear(
+						!user.last_get_check_in_rewards ||
+						(isDifferentMonthOrYear(
 							user.last_get_check_in_rewards,
 							user.last_check_in,
 						) &&
-						isDifferentMonthOrYear(user.last_check_in, check_in_time)
+							isDifferentMonthOrYear(user.last_check_in, check_in_time))
 					) {
-						const { previous_month_data, current_month_data } =
-							daily_check_in.reduce(
-								(result, check_in_data) => {
-									if (
-										isTheMonthOfSameYear(
-											check_in_data.checked_date,
-											user.last_check_in,
-										)
-									) {
-										return {
-											...result,
-											previous_month_data: [
-												...result.previous_month_data,
-												check_in_data,
-											],
-										};
-									}
-									if (
-										isTheMonthOfSameYear(
-											check_in_data.checked_date,
-											check_in_time,
-										)
-									) {
-										return {
-											...result,
-											current_month_data: [
-												...result.current_month_data,
-												check_in_data,
-											],
-										};
-									}
-								},
-								{
-									previous_month_data: [],
-									current_month_data: [],
-								},
+						const previous_month_point = user.daily_check_in.length;
+						const current_daily_check_in =
+							await this.daily_check_in_service.addCheckInData(
+								user._id.toString(),
+								check_in_time,
 							);
-						const previous_month_point = previous_month_data.length;
-						const current_month_point = current_month_data.length + 1; // One more point for the day has just checked-in
 						return await this.users_repository.update(user._id.toString(), {
 							last_check_in: check_in_time,
 							last_get_check_in_rewards: check_in_time,
-							daily_check_in: [
-								...daily_check_in,
-								{
-									eligible_for_reward: true,
-									checked_date: check_in_time,
-								},
-							],
-							point: user.point + previous_month_point + current_month_point,
+							daily_check_in: current_daily_check_in.check_in_data,
+							point:
+								user.point +
+								previous_month_point +
+								current_daily_check_in.check_in_data.length,
 						});
 					}
-					// Case 2.2.1.2
-					const current_month_point =
-						1 +
-						daily_check_in.filter((check_in_data) =>
-							isTheMonthOfSameYear(check_in_data.checked_date, check_in_time),
-						).length;
+					// Case 2.2.1.2: PASS
+					const current_daily_check_in =
+						await this.daily_check_in_service.addCheckInData(
+							user._id.toString(),
+							check_in_time,
+						);
 					return await this.users_repository.update(user._id.toString(), {
 						last_check_in: check_in_time,
 						last_get_check_in_rewards: check_in_time,
-						daily_check_in: [
-							...daily_check_in,
-							{
-								eligible_for_reward: true,
-								checked_date: check_in_time,
-							},
-						],
-						point: user.point + current_month_point,
+						daily_check_in: current_daily_check_in.check_in_data,
+						point: user.point + current_daily_check_in.check_in_data.length,
 					});
 				}
-				// Case 2.2.2.1
+				// Case 2.2.2.1: PASS
 				if (
-					isDifferentMonthOrYear(
+					!user.last_get_check_in_rewards ||
+					(isDifferentMonthOrYear(
 						user.last_get_check_in_rewards,
 						user.last_check_in,
 					) &&
-					isDifferentMonthOrYear(user.last_check_in, check_in_time)
+						isDifferentMonthOrYear(user.last_check_in, check_in_time))
 				) {
-					const previous_month_point = daily_check_in.filter((check_in_data) =>
-						isTheMonthOfSameYear(
-							check_in_data.checked_date,
-							user.last_check_in,
-						),
-					).length;
+					const previous_month_point = user.daily_check_in.length;
+					const current_daily_check_in =
+						await this.daily_check_in_service.addCheckInData(
+							user._id.toString(),
+							check_in_time,
+						);
 					return await this.users_repository.update(user._id.toString(), {
 						last_check_in: check_in_time,
 						last_get_check_in_rewards: check_in_time,
-						daily_check_in: [
-							...daily_check_in,
-							{
-								eligible_for_reward: false,
-								checked_date: check_in_time,
-							},
-						],
+						daily_check_in: current_daily_check_in.check_in_data,
 						point: user.point + previous_month_point,
 					});
 				}
-				// Case 2.2.2.2
+				// Case 2.2.2.2: PASS
+				const current_daily_check_in =
+					await this.daily_check_in_service.addCheckInData(
+						user._id.toString(),
+						check_in_time,
+					);
 				return await this.users_repository.update(user._id.toString(), {
 					last_check_in: check_in_time,
-					daily_check_in: [
-						...daily_check_in,
-						{
-							eligible_for_reward: false,
-							checked_date: check_in_time,
-						},
-					],
+					daily_check_in: current_daily_check_in.check_in_data,
 				});
 			}
 		} catch (error) {

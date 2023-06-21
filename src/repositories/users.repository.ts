@@ -46,6 +46,7 @@ export class UsersRepository
 	async getUserWithRole(user_id: string): Promise<User> {
 		return await this.user_model
 			.findById(user_id, '-password')
-			.populate([{ path: 'role', transform: (role: UserRole) => role?.name }]);
+			.populate([{ path: 'role', transform: (role: UserRole) => role?.name }])
+			.exec();
 	}
 }

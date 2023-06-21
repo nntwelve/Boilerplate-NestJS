@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
-export class DailyCheckIn {
+export class CheckInData {
 	@Prop({
 		default: new Date(),
 		required: true,
@@ -28,4 +28,4 @@ export class DailyCheckIn {
 	reward_days_count?: number; // Số ngày đã check, dùng để tính phần thưởng
 }
 
-export const DailyCheckInSchema = SchemaFactory.createForClass(DailyCheckIn);
+export const CheckInDataSchema = SchemaFactory.createForClass(CheckInData);

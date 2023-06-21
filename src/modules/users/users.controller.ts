@@ -12,16 +12,8 @@ import {
 	UploadedFiles,
 	Query,
 	ParseIntPipe,
+	Req,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
-import { Roles } from 'src/decorators/roles.decorator';
-import { RolesGuard } from '@modules/auth/guards/roles.guard';
-import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
 import {
 	ApiBearerAuth,
 	ApiBody,
@@ -30,7 +22,22 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+
+// INNER
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
+
+// OUTER
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolesGuard } from '@modules/auth/guards/roles.guard';
+import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
+
 import { ApiDocsPagination } from 'src/decorators/swagger-form-data.decorator';
+import { RequestWithUser } from 'src/types/requests.type';
 
 @Controller('users')
 @ApiTags('users')
@@ -103,6 +110,12 @@ export class UsersController {
 	updateStudentCard(@UploadedFiles() files: Array<Express.Multer.File>) {
 		console.log(files);
 		return files.map((file) => file.originalname);
+	}
+
+	@Post('daily-check-in')
+	@UseGuards(JwtAccessTokenGuard)
+	updateDailyCheckIn(@Req() { user }: RequestWithUser) {
+		return this.users_service.updateDailyCheckIn(user, new Date('2023-08-22'));
 	}
 
 	@Patch(':id')

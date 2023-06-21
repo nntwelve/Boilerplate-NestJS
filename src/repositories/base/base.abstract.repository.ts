@@ -51,6 +51,10 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 		};
 	}
 
+	async findOneAndUpdate(condition: object, dto: Partial<T>): Promise<T> {
+		return await this.model.findOneAndUpdate(condition, dto);
+	}
+
 	async update(id: string, dto: Partial<T>): Promise<T> {
 		return await this.model.findOneAndUpdate(
 			{ _id: id, deleted_at: null },

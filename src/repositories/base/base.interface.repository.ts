@@ -9,6 +9,8 @@ export interface BaseRepositoryInterface<T> {
 
 	findAll(condition: object, options?: object): Promise<FindAllResponse<T>>;
 
+	findOneAndUpdate(condition: object, dto: Partial<T>): Promise<T>;
+
 	update(id: string, dto: Partial<T>): Promise<T>;
 
 	softDelete(id: string): Promise<boolean>;
