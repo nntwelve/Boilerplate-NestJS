@@ -21,7 +21,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 		options?: QueryOptions<T>,
 	): Promise<T> {
 		const item = await this.model.findById(id, projection, options);
-		return item.deleted_at ? null : item;
+		return item?.deleted_at ? null : item;
 	}
 
 	async findOneByCondition(condition = {}): Promise<T> {
@@ -35,12 +35,15 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
 	async findAll(
 		condition: FilterQuery<T>,
-		projection?: string,
 		options?: QueryOptions<T>,
 	): Promise<FindAllResponse<T>> {
 		const [count, items] = await Promise.all([
 			this.model.count({ ...condition, deleted_at: null }),
-			this.model.find({ ...condition, deleted_at: null }, projection, options),
+			this.model.find(
+				{ ...condition, deleted_at: null },
+				options?.projection,
+				options,
+			),
 		]);
 		return {
 			count,
@@ -49,10 +52,11 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 	}
 
 	async update(id: string, dto: Partial<T>): Promise<T> {
-		await this.model
-			.updateOne({ _id: id, deleted_at: null }, dto, { new: true })
-			.exec();
-		return await this.model.findById(id).exec();
+		return await this.model.findOneAndUpdate(
+			{ _id: id, deleted_at: null },
+			dto,
+			{ new: true },
+		);
 	}
 
 	async softDelete(id: string): Promise<boolean> {
@@ -62,7 +66,9 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 		}
 
 		return !!(await this.model
-			.findByIdAndUpdate<T>(id, { deleted_at: new Date() })
+			.findByIdAndUpdate<T>(id, {
+				deleted_at: new Date(),
+			})
 			.exec());
 	}
 
@@ -71,6 +77,6 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 		if (!delete_item) {
 			return false;
 		}
-		return !!(await this.model.findOneAndDelete({ _id: id }));
+		return !!(await this.model.findByIdAndDelete(id));
 	}
 }

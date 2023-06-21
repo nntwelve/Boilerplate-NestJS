@@ -35,13 +35,12 @@ export class UsersService extends BaseServiceAbstract<User> {
 
 	async findAll(
 		filter?: object,
-		projection?: string,
+		options?: object,
 	): Promise<FindAllResponse<User>> {
-		return await this.users_repository.findAllWithSubFields(
-			filter,
-			projection,
-			'role',
-		);
+		return await this.users_repository.findAllWithSubFields(filter, {
+			...options,
+			populate: 'role',
+		});
 	}
 
 	async getUserByEmail(email: string): Promise<User> {

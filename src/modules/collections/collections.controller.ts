@@ -18,8 +18,6 @@ import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import {
 	ApiBearerAuth,
-	ApiBody,
-	ApiConsumes,
 	ApiOperation,
 	ApiParam,
 	ApiQuery,
