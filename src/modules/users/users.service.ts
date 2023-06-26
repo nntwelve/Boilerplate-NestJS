@@ -105,7 +105,10 @@ export class UsersService extends BaseServiceAbstract<User> {
 				// Case 1.1: PASS
 				if (isLastDayOfMonth(check_in_time)) {
 					const check_in_data = [
-						{ eligible_for_reward: true, checked_date: check_in_time },
+						{
+							eligible_for_reward: true,
+							checked_date: check_in_time.toDateString() as unknown as Date,
+						},
 					];
 					const [updated_user] = await Promise.all([
 						this.users_repository.update(user._id.toString(), {
@@ -125,11 +128,15 @@ export class UsersService extends BaseServiceAbstract<User> {
 					return updated_user;
 				}
 				// Case 1.2: PASS
+				const check_in_data = [
+					{
+						eligible_for_reward: false,
+						checked_date: check_in_time.toDateString() as unknown as Date,
+					},
+				];
 				const [updated_user] = await Promise.all([
-					await this.users_repository.update(user._id.toString(), {
-						daily_check_in: [
-							{ eligible_for_reward: false, checked_date: check_in_time },
-						],
+					this.users_repository.update(user._id.toString(), {
+						daily_check_in: check_in_data,
 						last_check_in: check_in_time,
 					}),
 					this.daily_check_in_service.create({
@@ -137,9 +144,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 						month_year: `${
 							check_in_time.getMonth() + 1
 						}-${check_in_time.getFullYear()}`,
-						check_in_data: [
-							{ eligible_for_reward: false, checked_date: check_in_time },
-						],
+						check_in_data,
 					}),
 				]);
 				return updated_user;

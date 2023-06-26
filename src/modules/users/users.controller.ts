@@ -115,7 +115,7 @@ export class UsersController {
 	@Post('daily-check-in')
 	@UseGuards(JwtAccessTokenGuard)
 	updateDailyCheckIn(@Req() { user }: RequestWithUser) {
-		return this.users_service.updateDailyCheckIn(user, new Date('2023-08-22'));
+		return this.users_service.updateDailyCheckIn(user, new Date());
 	}
 
 	@Patch(':id')

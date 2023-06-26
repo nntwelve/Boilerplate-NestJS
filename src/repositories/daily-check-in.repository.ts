@@ -8,7 +8,6 @@ import {
 	DailyCheckInDocument,
 } from '@modules/daily-check-in/entities/daily-check-in.entity';
 import { DailyCheckInRepositoryInterface } from '@modules/daily-check-in/interfaces/daily-check-in.interface';
-import { CheckInData } from '@modules/daily-check-in/entities/check-in-data.entity';
 
 // OUTER
 import { BaseRepositoryAbstract } from './base/base.abstract.repository';
@@ -33,7 +32,7 @@ export class DailyCheckInRepository
 					month_year: `${
 						check_in_date.getMonth() + 1
 					}-${check_in_date.getFullYear()}`,
-					'check_in_data.checked_date': check_in_date,
+					'check_in_data.checked_date': check_in_date.toDateString(),
 				},
 				{
 					$inc: {
@@ -51,6 +50,12 @@ export class DailyCheckInRepository
 
 	async addCheckInData(user_id: string, check_in_date: Date) {
 		try {
+			const daily_check_in = await this.daily_check_in_model.findOne({
+				user: user_id,
+				month_year: `${
+					check_in_date.getMonth() + 1
+				}-${check_in_date.getFullYear()}`,
+			});
 			return await this.daily_check_in_model.findOneAndUpdate(
 				{
 					user: user_id,
@@ -62,8 +67,11 @@ export class DailyCheckInRepository
 					$push: {
 						check_in_data: {
 							eligible_for_reward: true,
-							checked_date: check_in_date,
-						} as CheckInData,
+							checked_date: check_in_date.toDateString(),
+							reward_days_count: daily_check_in
+								? daily_check_in.check_in_data.length + 1
+								: 1,
+						},
 					},
 				},
 				{
