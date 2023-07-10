@@ -21,12 +21,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 			exception instanceof HttpException
 				? exception.message
 				: 'Internal server error';
-
 		response.status(status).json({
 			statusCode: status,
 			message,
 			error:
-				this.config_service.get('NODE_ENV') === 'production'
+				this.config_service.get('NODE_ENV') !== 'production'
 					? {
 							response: exception.response,
 							stack: exception.stack,
