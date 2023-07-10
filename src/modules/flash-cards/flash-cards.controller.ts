@@ -10,6 +10,7 @@ import {
 	UploadedFile,
 	Req,
 	UseGuards,
+	Query,
 } from '@nestjs/common';
 import { FlashCardsService } from './flash-cards.service';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
@@ -19,6 +20,7 @@ import {
 	ApiBody,
 	ApiConsumes,
 	ApiOperation,
+	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -85,12 +87,13 @@ export class FlashCardsController {
 		@UploadedFile() image: Express.Multer.File,
 		@Body() create_flash_card_dto: CreateFlashCardDto,
 	) {
-		console.log(create_flash_card_dto);
-		return this.flash_cards_service.create({
-			...create_flash_card_dto,
-			user: request.user,
-			image: image.originalname,
-		});
+		return this.flash_cards_service.createFlashCard(
+			{
+				...create_flash_card_dto,
+				user: request.user,
+			},
+			image,
+		);
 	}
 
 	@Get()
@@ -114,5 +117,14 @@ export class FlashCardsController {
 	@Delete(':id')
 	remove(@Param('id') id: string) {
 		return this.flash_cards_service.remove(id);
+	}
+
+	@Patch('queue/state')
+	@ApiQuery({
+		name: 'state',
+		enum: ['PAUSE', 'RESUME'],
+	})
+	pauseOrResumeQueue(@Query('state') state: string) {
+		return this.flash_cards_service.pauseOrResumeQueue(state);
 	}
 }
