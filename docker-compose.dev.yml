@@ -41,6 +41,26 @@ services:
       - flash_cards_mongodb
     restart: unless-stopped
 
+  flash_cards_redis:
+    container_name: flash_cards_redis
+    image: redis:alpine
+    expose:
+      - 6379
+    ports:
+      - 6379:6379 # Public port để lát nữa test multiple worker
+    restart: unless-stopped
+
+  redis_commander:
+    container_name: redis_commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:flash_cards_redis:6379
+    ports:
+      - 8088:8081
+    depends_on:
+      - flash_cards_redis
+    restart: unless-stopped
+
 networks:
   default:
     driver: bridge
