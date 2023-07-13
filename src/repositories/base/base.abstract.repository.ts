@@ -45,6 +45,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 				options,
 			),
 		]);
+
 		return {
 			count,
 			items,
@@ -82,5 +83,9 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 			return false;
 		}
 		return !!(await this.model.findByIdAndDelete(id));
+	}
+
+	async insertMany(items: T[]): Promise<T[]> {
+		return await this.model.insertMany(items);
 	}
 }

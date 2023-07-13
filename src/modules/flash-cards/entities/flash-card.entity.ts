@@ -37,4 +37,12 @@ export class FlashCard extends BaseEntity {
 	topics: Topic[];
 }
 
-export const FlashCardSchema = SchemaFactory.createForClass(FlashCard);
+const schema = SchemaFactory.createForClass(FlashCard);
+
+// This will take no effect
+// schema.index({ _id: 1, vocabulary: 1 }, { unique: true });
+
+// This will work
+schema.index({ vocabulary: 1, _id: 1 });
+
+export const FlashCardSchema = schema;

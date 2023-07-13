@@ -11,6 +11,7 @@ import {
 	Req,
 	UseGuards,
 	Query,
+	ParseIntPipe,
 } from '@nestjs/common';
 import { FlashCardsService } from './flash-cards.service';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
@@ -27,6 +28,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RequestWithUser } from 'src/types/requests.type';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { SwaggerArrayConversion } from 'src/interceptors/swagger-array-conversion.interceptor';
+import { ApiDocsPagination } from 'src/decorators/swagger-form-data.decorator';
+import { FlashCard } from './entities/flash-card.entity';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 
 @Controller('flash-cards')
 @ApiTags('flash-cards')
@@ -97,8 +101,31 @@ export class FlashCardsController {
 	}
 
 	@Get()
-	findAll() {
-		return this.flash_cards_service.findAll();
+	@UseInterceptors(LoggingInterceptor)
+	@ApiDocsPagination(FlashCard.name)
+	findAll(
+		@Query('offset', ParseIntPipe) offset: number,
+		@Query('limit', ParseIntPipe) limit: number,
+	) {
+		return this.flash_cards_service.findAll({}, { offset, limit });
+	}
+
+	@Get('keyset-pagination')
+	@ApiQuery({ name: 'last_id', required: false })
+	@ApiQuery({ name: 'last_vocabulary', required: false })
+	@ApiQuery({ name: 'search', required: false })
+	@UseInterceptors(LoggingInterceptor)
+	findAllUsingKeyset(
+		@Query('search') search: string,
+		@Query('last_id') last_id: string,
+		@Query('last_vocabulary') last_vocabulary: string,
+		@Query('limit', ParseIntPipe) limit: number,
+	) {
+		return this.flash_cards_service.findAllUsingKeysetPagination(
+			{ search },
+			{ last_id, last_vocabulary },
+			{ limit },
+		);
 	}
 
 	@Get(':id')
@@ -126,5 +153,12 @@ export class FlashCardsController {
 	})
 	pauseOrResumeQueue(@Query('state') state: string) {
 		return this.flash_cards_service.pauseOrResumeQueue(state);
+	}
+
+	@Post('seed-data')
+	@ApiBearerAuth('token')
+	@UseGuards(JwtAccessTokenGuard)
+	seedFlashCards(@Req() { user }: RequestWithUser) {
+		return this.flash_cards_service.seedData(user);
 	}
 }

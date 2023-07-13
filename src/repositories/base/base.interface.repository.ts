@@ -16,4 +16,6 @@ export interface BaseRepositoryInterface<T> {
 	softDelete(id: string): Promise<boolean>;
 
 	permanentlyDelete(id: string): Promise<boolean>;
+
+	insertMany(items: T[]): Promise<T[]>;
 }
