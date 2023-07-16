@@ -12,6 +12,7 @@ import { DailyCheckInRepository } from '@repositories/daily-check-in.repository'
 
 // OUTER
 import { createUserStub } from '@modules/users/test/stubs/user.stub';
+import { PERIOD_TYPE } from '@modules/daily-check-in/dto/get-daily-check-in.dto';
 
 describe('DailyCheckInRepository', () => {
 	let daily_check_in_model: Model<DailyCheckInDocument>;
@@ -49,10 +50,7 @@ describe('DailyCheckInRepository', () => {
 			expect(daily_check_in_model.findOneAndUpdate).toBeCalledWith(
 				{
 					user: user._id,
-					month_year: `${
-						check_in_date.getMonth() + 1
-					}-${check_in_date.getFullYear()}`,
-					'check_in_data.checked_date': check_in_date,
+					'check_in_data.checked_date': check_in_date.toDateString(),
 				},
 				{
 					$inc: {
@@ -72,6 +70,7 @@ describe('DailyCheckInRepository', () => {
 			const user = createUserStub();
 			const check_in_date = new Date('2023-02-28');
 			jest.spyOn(daily_check_in_model, 'findOneAndUpdate');
+
 			// Act
 			await daily_check_in_repository.addCheckInData(
 				user._id.toString(),
@@ -90,7 +89,8 @@ describe('DailyCheckInRepository', () => {
 					$push: {
 						check_in_data: {
 							eligible_for_reward: true,
-							checked_date: check_in_date,
+							checked_date: check_in_date.toDateString(),
+							reward_days_count: 1,
 						},
 					},
 				},
@@ -99,6 +99,51 @@ describe('DailyCheckInRepository', () => {
 					upsert: true,
 				},
 			);
+		});
+	});
+
+	describe('findAllByPeriod', () => {
+		describe('Year', () => {
+			it('should be call to model to return entire check in data of given year', async () => {
+				// Arrange
+				const filter = {
+					year: '2023',
+					type: PERIOD_TYPE.YEAR,
+					user_id: createUserStub()._id as string,
+				};
+				jest.spyOn(daily_check_in_model, 'find');
+				// Act
+				await daily_check_in_repository.findAllByPeriod(filter);
+
+				// Assert
+				expect(daily_check_in_model.find).toBeCalledWith({
+					user: filter.user_id,
+					month_year: {
+						$regex: filter.year,
+						$options: 'i',
+					},
+				});
+			});
+		});
+		describe('Month', () => {
+			it('should be call to model to return check in data of given month', async () => {
+				// Arrange
+				const filter = {
+					month: '7',
+					year: '2023',
+					type: PERIOD_TYPE.MONTH,
+					user_id: createUserStub()._id as string,
+				};
+				jest.spyOn(daily_check_in_model, 'findOne');
+				// Act
+				await daily_check_in_repository.findAllByPeriod(filter);
+
+				// Assert
+				expect(daily_check_in_model.findOne).toBeCalledWith({
+					user: filter.user_id,
+					month_year: `${+filter.month}-${filter.year}`,
+				});
+			});
 		});
 	});
 });

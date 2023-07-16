@@ -5,6 +5,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { DailyCheckInRepository } from '@repositories/daily-check-in.repository';
 import { DailyCheckInService } from '../daily-check-in.service';
 import { DailyCheckInRepositoryInterface } from '../interfaces/daily-check-in.interface';
+import { PERIOD_TYPE } from '../dto/get-daily-check-in.dto';
 
 // OUTER
 import { createUserStub } from '@modules/users/test/stubs/user.stub';
@@ -73,6 +74,29 @@ describe('DailyCheckInService', () => {
 				user._id,
 				check_in_date,
 			);
+		});
+	});
+
+	describe('findAllByPeriod', () => {
+		it('should get check in data by call to repository', async () => {
+			// Arrange
+			const filter = {
+				year: '2023',
+				type: PERIOD_TYPE.YEAR,
+			};
+			const user = createUserStub();
+
+			// Act
+			await daily_check_in_service.findAllByPeriod({
+				user_id: user._id.toString(),
+				...filter,
+			});
+
+			// Assert
+			expect(daily_check_in_repository.findAllByPeriod).toBeCalledWith({
+				user_id: user._id,
+				...filter,
+			});
 		});
 	});
 });

@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Inject,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 // INNER
@@ -17,6 +22,11 @@ import {
 } from 'src/shared/helpers/date.helper';
 
 import { DailyCheckInService } from '@modules/daily-check-in/daily-check-in.service';
+import { DailyCheckIn } from '@modules/daily-check-in/entities/daily-check-in.entity';
+import {
+	PERIOD_TYPE,
+	findAllByPeriodDto,
+} from '@modules/daily-check-in/dto/get-daily-check-in.dto';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -100,6 +110,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 					? new Date()
 					: new Date(date_for_testing);
 			const { daily_check_in } = user;
+
 			// Case 1
 			if (!daily_check_in?.length) {
 				// Case 1.1: PASS
@@ -238,6 +249,26 @@ export class UsersService extends BaseServiceAbstract<User> {
 					daily_check_in: current_daily_check_in.check_in_data,
 				});
 			}
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async getCheckInData(
+		id: string,
+		filter: findAllByPeriodDto,
+	): Promise<DailyCheckIn[] | DailyCheckIn> {
+		try {
+			if (
+				filter.type === PERIOD_TYPE.MONTH &&
+				(!filter.month || !filter.year)
+			) {
+				throw new BadRequestException();
+			}
+			return await this.daily_check_in_service.findAllByPeriod({
+				user_id: id,
+				...filter,
+			});
 		} catch (error) {
 			throw error;
 		}

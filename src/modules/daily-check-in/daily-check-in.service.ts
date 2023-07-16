@@ -3,6 +3,7 @@ import { Inject } from '@nestjs/common';
 // INNER
 import { DailyCheckIn } from './entities/daily-check-in.entity';
 import { DailyCheckInRepositoryInterface } from './interfaces/daily-check-in.interface';
+import { findAllByPeriodDto } from './dto/get-daily-check-in.dto';
 
 // OUTER
 import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
@@ -38,6 +39,16 @@ export class DailyCheckInService extends BaseServiceAbstract<DailyCheckIn> {
 				user_id,
 				check_in_date,
 			);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async findAllByPeriod(
+		filter: findAllByPeriodDto,
+	): Promise<DailyCheckIn[] | DailyCheckIn> {
+		try {
+			return await this.daily_check_in_repository.findAllByPeriod(filter);
 		} catch (error) {
 			throw error;
 		}

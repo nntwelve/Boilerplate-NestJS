@@ -11,6 +11,10 @@ import { DailyCheckInRepositoryInterface } from '@modules/daily-check-in/interfa
 
 // OUTER
 import { BaseRepositoryAbstract } from './base/base.abstract.repository';
+import {
+	PERIOD_TYPE,
+	findAllByPeriodDto,
+} from '@modules/daily-check-in/dto/get-daily-check-in.dto';
 
 @Injectable()
 export class DailyCheckInRepository
@@ -29,9 +33,6 @@ export class DailyCheckInRepository
 			return await this.daily_check_in_model.findOneAndUpdate(
 				{
 					user: user_id,
-					month_year: `${
-						check_in_date.getMonth() + 1
-					}-${check_in_date.getFullYear()}`,
 					'check_in_data.checked_date': check_in_date.toDateString(),
 				},
 				{
@@ -50,12 +51,14 @@ export class DailyCheckInRepository
 
 	async addCheckInData(user_id: string, check_in_date: Date) {
 		try {
-			const daily_check_in = await this.daily_check_in_model.findOne({
-				user: user_id,
-				month_year: `${
-					check_in_date.getMonth() + 1
-				}-${check_in_date.getFullYear()}`,
-			});
+			const daily_check_in = await this.daily_check_in_model
+				.findOne({
+					user: user_id,
+					month_year: `${
+						check_in_date.getMonth() + 1
+					}-${check_in_date.getFullYear()}`,
+				})
+				.exec();
 			return await this.daily_check_in_model.findOneAndUpdate(
 				{
 					user: user_id,
@@ -79,6 +82,32 @@ export class DailyCheckInRepository
 					upsert: true,
 				},
 			);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async findAllByPeriod(
+		filter: findAllByPeriodDto,
+	): Promise<DailyCheckIn[] | DailyCheckIn> {
+		try {
+			switch (filter.type) {
+				case PERIOD_TYPE.YEAR:
+					return await this.daily_check_in_model.find({
+						month_year: {
+							$regex: filter.year,
+							$options: 'i',
+						},
+						user: filter.user_id,
+					});
+				case PERIOD_TYPE.MONTH:
+					return await this.daily_check_in_model.findOne({
+						user: filter.user_id,
+						month_year: `${+filter.month}-${filter.year}`,
+					});
+				default:
+					break;
+			}
 		} catch (error) {
 			throw error;
 		}
