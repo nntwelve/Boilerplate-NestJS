@@ -224,5 +224,10 @@ export const UserSchemaFactory = (
 			} ${this.address[0].country}`;
 		}
 	});
+
+	// user_schema.index({ address: 1 });
+	user_schema.index({ 'address.country': 1 });
+	user_schema.index({ username: 1, point: 1 });
+
 	return user_schema;
 };
