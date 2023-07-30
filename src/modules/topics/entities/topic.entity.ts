@@ -16,4 +16,8 @@ export class Topic extends BaseEntity {
 	description: string;
 }
 
-export const TopicSchema = SchemaFactory.createForClass(Topic);
+const schema = SchemaFactory.createForClass(Topic);
+
+schema.index({ name: 1 });
+
+export const TopicSchema = schema;
