@@ -1,7 +1,10 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
+
+// INNER
 import { FlashCardsService } from '../flash-cards.service';
+import { UploadFileServiceAbstract } from 'src/services/files/upload-file.abstract.service';
 
 @Processor('image:upload', {
 	concurrency: 10,
@@ -12,7 +15,10 @@ import { FlashCardsService } from '../flash-cards.service';
 	},
 })
 export class ImageUploadingProcessor extends WorkerHost {
-	constructor(private readonly flash_cards_service: FlashCardsService) {
+	constructor(
+		private readonly flash_cards_service: FlashCardsService,
+		private readonly upload_file_service: UploadFileServiceAbstract,
+	) {
 		super();
 	}
 	private logger = new Logger();
@@ -56,22 +62,19 @@ export class ImageUploadingProcessor extends WorkerHost {
 					}
 				}
 
-				const uploaded_image = await this.uploadingImageToS3(optimzied_image);
+				this.logger.log('Start uploading image to S3...');
+
+				const uploaded_result =
+					await this.upload_file_service.uploadFileToPublicBucket(
+						`flash-card/${job.data.full_name}-${job.data.user_id}`,
+						{ file: optimzied_image, file_name: job.data.file_name },
+					);
 				const uploaded = await this.flash_cards_service.update(job.data.id, {
-					image: `image_url_from_s3_${uploaded_image.originalname}`,
+					image: uploaded_result,
 				});
 				return uploaded;
 			default:
 				throw new Error('No job name match');
 		}
-	}
-
-	async uploadingImageToS3(
-		image: Express.Multer.File,
-	): Promise<Express.Multer.File> {
-		this.logger.log('Start uploading image to S3...');
-		return await new Promise((resolve) =>
-			setTimeout(() => resolve(image), 5000),
-		);
 	}
 }

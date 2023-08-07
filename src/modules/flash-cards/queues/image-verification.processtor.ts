@@ -40,11 +40,12 @@ export class ImageVerificationProcessor extends WorkerHost {
 	}
 
 	async process(job: Job<any, any, string>, token?: string): Promise<any> {
-		console.log('Comminggg');
 		switch (job.name) {
 			case 'check-term':
+				this.logger.log('Start checking term...');
 				return await this.checkTerm(job.data);
 			case 'check-policy':
+				this.logger.log('Start checking policy...');
 				return await this.checkPolicy(job.data);
 
 			default:

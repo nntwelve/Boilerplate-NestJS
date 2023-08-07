@@ -103,11 +103,18 @@ export class FlashCardsService extends BaseServiceAbstract<FlashCard> {
 		await this.image_upload_flow.add({
 			name: 'uploading-image',
 			queueName: 'image:upload',
-			data: { id: flash_card._id },
+			data: {
+				id: flash_card._id,
+				user_id: create_dto.user._id,
+				full_name: `${create_dto.user.first_name} ${create_dto.user.last_name}`,
+				file_name: `${create_dto.vocabulary}-${flash_card._id}`,
+			},
 			children: [
 				{
 					name: 'optimize-size',
-					data: { file },
+					data: {
+						file,
+					},
 					queueName: 'image:optimize',
 					opts: {
 						delay: 2000,
@@ -152,7 +159,10 @@ export class FlashCardsService extends BaseServiceAbstract<FlashCard> {
 					definition: keyword,
 					meaning: keyword,
 					pronunciation: keyword,
-					image: keyword,
+					image: {
+						key: keyword,
+						url: keyword,
+					},
 					is_public: true,
 					user,
 					examples: [keyword],

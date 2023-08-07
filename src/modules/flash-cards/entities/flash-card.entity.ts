@@ -1,7 +1,9 @@
 import { BaseEntity } from '@modules/shared/base/base.entity';
+import { PublicFile } from '@modules/shared/upload-files/public-files.entity';
 import { Topic } from '@modules/topics/entities/topic.entity';
 import { User } from '@modules/users/entities/user.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Type } from 'class-transformer';
 import * as mongoose from 'mongoose';
 
 export type FlashCardDocument = mongoose.HydratedDocument<FlashCard>;
@@ -12,8 +14,11 @@ export class FlashCard extends BaseEntity {
 	@Prop({ required: true })
 	vocabulary: string;
 
-	@Prop()
-	image: string;
+	@Prop({
+		type: PublicFile,
+	})
+	@Type(() => PublicFile)
+	image: PublicFile;
 
 	@Prop({ required: true })
 	definition: string;

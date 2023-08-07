@@ -9,6 +9,8 @@ import { ImageOptimizationProcessor } from './queues/image-optimization.processo
 import { join } from 'path';
 import { ImageVerificationProcessor } from './queues/image-verification.processtor';
 import { ImageUploadingProcessor } from './queues/image-uploading.processor';
+import { UploadFileServiceAbstract } from 'src/services/files/upload-file.abstract.service';
+import { UploadFileServiceS3 } from 'src/services/files/upload-file-s3.service';
 
 @Module({
 	imports: [
@@ -60,6 +62,10 @@ import { ImageUploadingProcessor } from './queues/image-uploading.processor';
 		ImageOptimizationProcessor,
 		ImageVerificationProcessor,
 		ImageUploadingProcessor,
+		{
+			provide: UploadFileServiceAbstract,
+			useClass: UploadFileServiceS3,
+		},
 	],
 })
 export class FlashCardsModule {}
