@@ -27,6 +27,10 @@ import { BullModule } from '@nestjs/bullmq';
 				DATABASE_PASSWORD: Joi.string().min(4).required(),
 				DATABASE_HOST: Joi.string().required(),
 				DATABASE_URI: Joi.string().required(),
+				AWS_S3_PUBLIC_BUCKET: Joi.string().required(),
+				AWS_S3_REGION: Joi.string().required(),
+				AWS_S3_ACCESS_KEY_ID: Joi.string().required(),
+				AWS_S3_SECRET_ACCESS_KEY: Joi.string().required(),
 			}),
 			validationOptions: {
 				abortEarly: false,
