@@ -31,6 +31,7 @@ import { SwaggerArrayConversion } from 'src/interceptors/swagger-array-conversio
 import { ApiDocsPagination } from 'src/decorators/swagger-form-data.decorator';
 import { FlashCard } from './entities/flash-card.entity';
 import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
+import { generateNextKey } from 'src/shared/utils/pagination';
 
 @Controller('flash-cards')
 @ApiTags('flash-cards')
@@ -114,13 +115,26 @@ export class FlashCardsController {
 	@ApiQuery({ name: 'last_id', required: false })
 	@ApiQuery({ name: 'last_vocabulary', required: false })
 	@ApiQuery({ name: 'search', required: false })
+	@ApiQuery({ name: 'offset', required: false })
 	@UseInterceptors(LoggingInterceptor)
-	findAllUsingKeyset(
+	async findAllUsingKeyset(
 		@Query('search') search: string,
 		@Query('last_id') last_id: string,
 		@Query('last_vocabulary') last_vocabulary: string,
 		@Query('limit', ParseIntPipe) limit: number,
+		@Query('offset') offset: number,
 	) {
+		if (offset) {
+			const { count, items } = await this.flash_cards_service.findAll(
+				{ search },
+				{ offset, limit },
+			);
+			return {
+				count,
+				items,
+				next_key: generateNextKey(items, ['vocabulary', 'meaning']),
+			};
+		}
 		return this.flash_cards_service.findAllUsingKeysetPagination(
 			{ search },
 			{ last_id, last_vocabulary },

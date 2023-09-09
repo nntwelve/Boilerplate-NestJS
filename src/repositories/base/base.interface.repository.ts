@@ -18,4 +18,6 @@ export interface BaseRepositoryInterface<T> {
 	permanentlyDelete(id: string): Promise<boolean>;
 
 	insertMany(items: T[]): Promise<T[]>;
+
+	count(condition: object): Promise<number>;
 }

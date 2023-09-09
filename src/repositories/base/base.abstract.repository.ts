@@ -12,7 +12,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
 	async create(dto: T | any): Promise<T> {
 		const created_data = await this.model.create(dto);
-		return created_data.save();
+		return created_data.save() as any;
 	}
 
 	async findOneById(
@@ -45,6 +45,12 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 				options,
 			),
 		]);
+
+		// console.log(
+		// 	await this.model
+		// 		.find({ ...condition, deleted_at: null }, options?.projection, options)
+		// 		.explain(),
+		// );
 
 		return {
 			count,
@@ -86,6 +92,10 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 	}
 
 	async insertMany(items: T[]): Promise<T[]> {
-		return await this.model.insertMany(items);
+		return (await this.model.insertMany(items)) as any;
+	}
+
+	async count(condition: object): Promise<number> {
+		return await this.model.count(condition);
 	}
 }

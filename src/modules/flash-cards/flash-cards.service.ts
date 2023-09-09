@@ -67,13 +67,13 @@ export class FlashCardsService extends BaseServiceAbstract<FlashCard> {
 		} else {
 			final_query = pagination_query;
 		}
-		const { count, items } = await this.flash_cards_repository.findAll(
-			final_query,
-			{
+		const [{ items }, count] = await Promise.all([
+			this.flash_cards_repository.findAll(final_query, {
 				limit: options.limit,
 				sort: { vocabulary: 1, _id: 1 },
-			},
-		);
+			}),
+			this.flash_cards_repository.count(api_query),
+		]);
 		return {
 			count,
 			items,
