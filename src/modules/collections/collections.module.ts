@@ -19,5 +19,6 @@ import { CollectionRepository } from '@repositories/collection.repository';
 			useClass: CollectionRepository,
 		},
 	],
+	exports: [CollectionsService],
 })
 export class CollectionsModule {}

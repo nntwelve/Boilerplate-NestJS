@@ -61,5 +61,6 @@ import { ImageUploadingProcessor } from './queues/image-uploading.processor';
 		ImageVerificationProcessor,
 		ImageUploadingProcessor,
 	],
+	exports: [FlashCardsService],
 })
 export class FlashCardsModule {}

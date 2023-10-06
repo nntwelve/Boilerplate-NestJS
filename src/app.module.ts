@@ -14,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './exception-filters/global-exception.filter';
 import { BullModule } from '@nestjs/bullmq';
+import { CommentsModule } from '@modules/comments/comments.module';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -50,6 +51,7 @@ import { BullModule } from '@nestjs/bullmq';
 		TopicsModule,
 		FlashCardsModule,
 		CollectionsModule,
+		CommentsModule,
 		AuthModule,
 		BullModule.forRootAsync({
 			inject: [ConfigService],
