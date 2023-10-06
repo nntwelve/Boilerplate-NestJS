@@ -33,7 +33,7 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 			const parent = await this.comments_repository.findOneById(
 				create_comment_dto.parent_id,
 			);
-			if (parent) {
+			if (!parent) {
 				throw new BadRequestException();
 			}
 			return this.comments_repository.create({
