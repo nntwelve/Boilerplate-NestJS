@@ -10,6 +10,7 @@ import {
 	Req,
 	ParseIntPipe,
 	UseGuards,
+	ParseBoolPipe,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -75,45 +76,39 @@ export class CommentsController {
 		required: false,
 		enum: SORT_TYPE,
 	})
-	async findAll(
-		@Query('target_id') target_id: string,
+	findAll(
+		@Query('target_id', ParseMongoIdPipe) target_id: string,
 		@Query('offset', ParseIntPipe) offset: number,
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('sort_type') sort_type: SORT_TYPE,
+		@Query('including_children', ParseBoolPipe) including_children: boolean,
 	) {
 		return this.comments_service.findAll(
 			{ target_id },
-			{ offset, limit, sort_type },
+			{ offset, limit, sort_type, including_children },
 		);
 	}
 
 	@Get(':comment_id')
 	@ApiOperation({
-		summary: 'Get more sub comments of specific comments',
+		summary: 'Get all sub comments of specific comments',
 	})
-	@ApiDocsPagination(Comment.name)
 	@ApiQuery({
-		name: 'sort_type',
+		name: 'deep_level',
 		required: false,
-		enum: SORT_TYPE,
+		example: 2,
 	})
-	async getMoreSubComments(
+	async getAllSubComments(
 		@Param('comment_id', ParseMongoIdPipe) comment_id: string,
 		@Query('target_id', ParseMongoIdPipe) target_id: string,
-		@Query('offset', ParseIntPipe) offset: number,
-		@Query('limit', ParseIntPipe) limit: number,
-		@Query('sort_type') sort_type: SORT_TYPE,
+		@Query('deep_level') deep_level: number,
 	) {
-		return this.comments_service.getMoreSubComments(
+		return this.comments_service.getAllSubComments(
 			{
 				target_id,
 				parent_id: comment_id,
 			},
-			{
-				offset,
-				limit,
-				sort_type,
-			},
+			deep_level,
 		);
 	}
 }

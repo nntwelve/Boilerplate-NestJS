@@ -45,6 +45,9 @@ export class Comment extends BaseEntity {
 	})
 	parent_id: mongoose.Types.ObjectId | Comment;
 
+	@Prop()
+	current_path: string;
+
 	@Prop({ default: 0 })
 	total_liked: number;
 

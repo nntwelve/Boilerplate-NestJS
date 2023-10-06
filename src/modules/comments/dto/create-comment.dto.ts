@@ -27,4 +27,6 @@ export class CreateCommentDto {
 	content: string;
 
 	created_by: User | string | ObjectId;
+
+	parent_path: string;
 }

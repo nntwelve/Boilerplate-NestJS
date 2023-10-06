@@ -4,8 +4,11 @@ import { FindAllResponse } from 'src/types/common.type';
 
 export interface CommentsRepositoryInterface
 	extends BaseRepositoryInterface<Comment> {
-	getCommentsWithHierarchy(
-		filter: object,
-		options: object,
-	): Promise<FindAllResponse<Comment>>;
+	getAllSubComments(
+		filter: {
+			target_id: string;
+			parent_id: string;
+		},
+		deep_level?: number,
+	): Promise<Array<Comment>>;
 }
