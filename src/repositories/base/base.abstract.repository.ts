@@ -86,6 +86,6 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 	}
 
 	async insertMany(items: T[]): Promise<T[]> {
-		return await this.model.insertMany(items);
+		return (await this.model.insertMany(items)) as unknown as T[];
 	}
 }

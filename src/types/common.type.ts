@@ -1,6 +1,6 @@
 export enum SORT_TYPE {
 	'DESC' = 'desc',
-	'ASC' = 'acs',
+	'ASC' = 'asc',
 }
 
 export type FindAllResponse<T> = {
