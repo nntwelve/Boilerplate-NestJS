@@ -63,7 +63,7 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 	}
 
 	async getMoreSubComments(
-		filter: { target_id: string; parent_id: string },
+		filter: { parent_id: string },
 		options: { offset: number; limit: number; sort_type: SORT_TYPE },
 	) {
 		return await this.comments_repository.findAll(filter, {

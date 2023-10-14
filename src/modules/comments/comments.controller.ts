@@ -99,14 +99,12 @@ export class CommentsController {
 	})
 	async getMoreSubComments(
 		@Param('comment_id', ParseMongoIdPipe) comment_id: string,
-		@Query('target_id', ParseMongoIdPipe) target_id: string,
 		@Query('offset', ParseIntPipe) offset: number,
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('sort_type') sort_type: SORT_TYPE,
 	) {
 		return this.comments_service.getMoreSubComments(
 			{
-				target_id,
 				parent_id: comment_id,
 			},
 			{
