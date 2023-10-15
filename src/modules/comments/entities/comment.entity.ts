@@ -45,7 +45,9 @@ export class Comment extends BaseEntity {
 	})
 	parent_id: mongoose.Types.ObjectId | Comment;
 
-	@Prop()
+	@Prop({
+		required: true,
+	})
 	current_path: string;
 
 	@Prop({ default: 0 })

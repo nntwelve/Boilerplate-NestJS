@@ -28,26 +28,22 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 			create_comment_dto.comment_type === COMMENT_TYPE.FLASH_CARD
 				? await this.flash_cards_service.findOne(create_comment_dto.target_id)
 				: await this.collections_service.findOne(create_comment_dto.target_id);
-
+		let parent_id = null,
+			parent_path = null;
 		if (create_comment_dto.parent_id) {
 			const parent = await this.comments_repository.findOneById(
 				create_comment_dto.parent_id,
 			);
-			if (!parent) {
-				throw new BadRequestException();
-			}
-			return await this.comments_repository.create({
-				...create_comment_dto,
-				target_id: target._id,
-				parent_id: parent._id,
-				parent_path: parent.current_path,
-			});
+			if (!parent) throw new BadRequestException();
+
+			parent_id = parent._id;
+			parent_path = parent.current_path;
 		}
 		return this.comments_repository.create({
 			...create_comment_dto,
 			target_id: target._id,
-			parent_id: null,
-			parent_path: null,
+			parent_id,
+			parent_path,
 		});
 	}
 
