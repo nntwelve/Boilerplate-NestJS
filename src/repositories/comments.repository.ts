@@ -44,6 +44,7 @@ export class CommentRepository
 	): Promise<Array<Comment>> {
 		return await this.comment_model.find({
 			target_id: filter.target_id,
+			deleted_at: null,
 			current_path: {
 				$regex: new RegExp(
 					`${filter.parent_id}(,[^,]*){1,${deep_level ?? ''}},$`,
