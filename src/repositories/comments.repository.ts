@@ -31,9 +31,9 @@ export class CommentRepository
 			limit,
 			sort_type,
 		}: { offset: number; limit: number; sort_type: SORT_TYPE },
-		limit_child = 1,
+		limit_child = 3,
 	): Promise<FindAllResponse<Comment>> {
-		console.log(sort_type);
+		console.log({ sort_type });
 		const response = await this.comment_model.aggregate<{
 			items: object;
 			count: { total: number };
@@ -43,6 +43,7 @@ export class CommentRepository
 				$match: {
 					...filter,
 					target_id: new mongoose.Types.ObjectId(filter.target_id),
+					deleted_at: null,
 				},
 			},
 			{
@@ -136,6 +137,12 @@ export class CommentRepository
 							$unwind: {
 								path: '$replies',
 								preserveNullAndEmptyArrays: true,
+							},
+						},
+						{
+							// Loại bỏ các reply bị xóa
+							$match: {
+								'replies.deleted_at': null,
 							},
 						},
 						{
