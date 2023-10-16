@@ -52,4 +52,19 @@ export class CommentRepository
 			},
 		});
 	}
+
+	async deleteCommentAndReplies(id: string): Promise<boolean> {
+		const reponse = await this.comment_model.updateMany(
+			{
+				current_path: {
+					$regex: new RegExp(id),
+					$options: 'i',
+				},
+			},
+			{
+				deleted_at: new Date(),
+			},
+		);
+		return reponse.modifiedCount !== 0;
+	}
 }

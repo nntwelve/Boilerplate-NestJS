@@ -111,4 +111,14 @@ export class CommentsController {
 			deep_level,
 		);
 	}
+
+	@Delete(':comment_id')
+	@ApiOperation({
+		summary: 'Soft delete comment and all reply comments',
+	})
+	async deleteComment(
+		@Param('comment_id', ParseMongoIdPipe) comment_id: string,
+	) {
+		return await this.comments_service.remove(comment_id);
+	}
 }

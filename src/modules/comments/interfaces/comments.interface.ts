@@ -11,4 +11,6 @@ export interface CommentsRepositoryInterface
 		},
 		deep_level?: number,
 	): Promise<Array<Comment>>;
+
+	deleteCommentAndReplies(id: string): Promise<boolean>;
 }

@@ -90,4 +90,8 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 	) {
 		return await this.comments_repository.getAllSubComments(filter, deep_level);
 	}
+
+	override async remove(id: string): Promise<boolean> {
+		return await this.comments_repository.deleteCommentAndReplies(id);
+	}
 }
