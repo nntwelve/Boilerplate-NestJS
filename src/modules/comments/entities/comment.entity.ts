@@ -45,6 +45,11 @@ export class Comment extends BaseEntity {
 	})
 	parent_id: mongoose.Types.ObjectId | Comment;
 
+	@Prop({
+		type: [{ type: mongoose.Types.ObjectId, ref: Comment.name }],
+	})
+	children_ids: Array<mongoose.Types.ObjectId> | Array<Comment>;
+
 	@Prop({ default: 0 })
 	total_liked: number;
 

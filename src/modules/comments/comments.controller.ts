@@ -18,6 +18,7 @@ import {
 	ApiBearerAuth,
 	ApiBody,
 	ApiOperation,
+	ApiParam,
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
@@ -74,9 +75,14 @@ export class CommentsController {
 		name: 'sort_type',
 		required: false,
 		enum: SORT_TYPE,
+		example: SORT_TYPE.DESC,
+	})
+	@ApiQuery({
+		name: 'target_id',
+		example: '64ab87fab9e86239671aded7',
 	})
 	async findAll(
-		@Query('target_id') target_id: string,
+		@Query('target_id', ParseMongoIdPipe) target_id: string,
 		@Query('offset', ParseIntPipe) offset: number,
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('sort_type') sort_type: SORT_TYPE,
@@ -87,31 +93,11 @@ export class CommentsController {
 		);
 	}
 
-	@Get(':comment_id')
+	@Delete(':id')
 	@ApiOperation({
-		summary: 'Get more sub comments of specific comments',
+		summary: 'Delete comment and replies comment (if existed)',
 	})
-	@ApiDocsPagination(Comment.name)
-	@ApiQuery({
-		name: 'sort_type',
-		required: false,
-		enum: SORT_TYPE,
-	})
-	async getMoreSubComments(
-		@Param('comment_id', ParseMongoIdPipe) comment_id: string,
-		@Query('offset', ParseIntPipe) offset: number,
-		@Query('limit', ParseIntPipe) limit: number,
-		@Query('sort_type') sort_type: SORT_TYPE,
-	) {
-		return this.comments_service.getMoreSubComments(
-			{
-				parent_id: comment_id,
-			},
-			{
-				offset,
-				limit,
-				sort_type,
-			},
-		);
+	remove(@Param('id', ParseMongoIdPipe) id: string) {
+		return this.comments_service.remove(id);
 	}
 }

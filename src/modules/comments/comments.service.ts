@@ -33,23 +33,29 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 			const parent = await this.comments_repository.findOneById(
 				create_comment_dto.parent_id,
 			);
-			if (parent) {
+			if (!parent) {
 				throw new BadRequestException();
 			}
-			return this.comments_repository.create({
+			const parent_id = parent.parent_id ? parent.parent_id : parent._id;
+			const comment = await this.comments_repository.create({
 				...create_comment_dto,
 				target_id: target._id,
-				parent_id: parent.parent_id ? parent.parent_id : parent._id,
+				parent_id,
 			});
+			this.comments_repository.addReplyComment(
+				parent_id as string,
+				comment._id as string,
+			);
+			return comment;
 		}
-		return this.comments_repository.create({
+		return await this.comments_repository.create({
 			...create_comment_dto,
 			target_id: target._id,
 		});
 	}
 
 	async findAll(filter: { target_id: string }, { offset, limit, sort_type }) {
-		return await this.comments_repository.getCommentsWithHierarchy(
+		return await this.comments_repository.findAll(
 			{
 				...filter,
 				parent_id: null,
@@ -58,20 +64,28 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 				offset,
 				limit,
 				sort_type,
+				populate: ['children_ids'],
 			},
 		);
 	}
 
-	async getMoreSubComments(
-		filter: { parent_id: string },
-		options: { offset: number; limit: number; sort_type: SORT_TYPE },
-	) {
-		return await this.comments_repository.findAll(filter, {
-			skip: options.offset,
-			limit: options.limit,
-			sort: {
-				created_at: options.sort_type,
-			},
-		});
+	async remove(id: string): Promise<boolean> {
+		const comment = await this.comments_repository.findOneById(id);
+		if (!comment) {
+			return false;
+		}
+		if (comment.children_ids.length) {
+			return await this.comments_repository.softDeleteMany([
+				...(comment.children_ids as unknown as Array<string>),
+				id,
+			]);
+		}
+		if (comment.parent_id) {
+			await this.comments_repository.removeReplyComment(
+				comment.parent_id.toString(),
+				id,
+			);
+		}
+		return await this.comments_repository.softDelete(comment._id.toString());
 	}
 }
