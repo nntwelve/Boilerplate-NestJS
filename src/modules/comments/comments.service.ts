@@ -29,6 +29,9 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 				? await this.flash_cards_service.findOne(create_comment_dto.target_id)
 				: await this.collections_service.findOne(create_comment_dto.target_id);
 
+		if (!target) {
+			throw new BadRequestException();
+		}
 		if (create_comment_dto.parent_id) {
 			const parent = await this.comments_repository.findOneById(
 				create_comment_dto.parent_id,
@@ -48,7 +51,10 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 		});
 	}
 
-	async findAll(filter: { target_id: string }, { offset, limit, sort_type }) {
+	async getCommentsWithHierarchy(
+		filter: { target_id: string },
+		{ offset, limit, sort_type },
+	) {
 		return await this.comments_repository.getCommentsWithHierarchy(
 			{
 				...filter,
@@ -62,16 +68,16 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 		);
 	}
 
-	async getMoreSubComments(
-		filter: { parent_id: string },
-		options: { offset: number; limit: number; sort_type: SORT_TYPE },
-	) {
-		return await this.comments_repository.findAll(filter, {
-			skip: options.offset,
-			limit: options.limit,
-			sort: {
-				created_at: options.sort_type,
-			},
-		});
-	}
+	// async getMoreSubComments(
+	// 	filter: { parent_id: string },
+	// 	options: { offset: number; limit: number; sort_type: SORT_TYPE },
+	// ) {
+	// 	return await this.comments_repository.findAll(filter, {
+	// 		skip: options.offset,
+	// 		limit: options.limit,
+	// 		sort: {
+	// 			created_at: options.sort_type,
+	// 		},
+	// 	});
+	// }
 }

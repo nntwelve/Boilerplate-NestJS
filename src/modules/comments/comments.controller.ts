@@ -75,13 +75,13 @@ export class CommentsController {
 		required: false,
 		enum: SORT_TYPE,
 	})
-	async findAll(
+	async getCommentsWithHierarchy(
 		@Query('target_id') target_id: string,
 		@Query('offset', ParseIntPipe) offset: number,
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('sort_type') sort_type: SORT_TYPE,
 	) {
-		return this.comments_service.findAll(
+		return this.comments_service.getCommentsWithHierarchy(
 			{ target_id },
 			{ offset, limit, sort_type },
 		);
@@ -103,7 +103,7 @@ export class CommentsController {
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('sort_type') sort_type: SORT_TYPE,
 	) {
-		return this.comments_service.getMoreSubComments(
+		return this.comments_service.findAll(
 			{
 				parent_id: comment_id,
 			},
