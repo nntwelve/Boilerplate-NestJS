@@ -19,12 +19,12 @@ export class CreateCommentDto {
 	comment_type: COMMENT_TYPE;
 
 	@IsOptional()
-	parent_id: string | null;
+	parent_id?: string | null;
 
 	@IsNotEmpty()
 	@MinLength(1)
 	@MaxLength(2000)
 	content: string;
 
-	created_by: User | string | ObjectId;
+	created_by?: User | string | ObjectId;
 }
