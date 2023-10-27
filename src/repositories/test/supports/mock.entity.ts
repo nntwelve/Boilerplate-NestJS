@@ -1,3 +1,5 @@
+import { UpdateWriteOpResult } from 'mongoose';
+
 export abstract class MockEntity<T> {
 	protected abstract entity_stub: T;
 
@@ -33,6 +35,13 @@ export abstract class MockEntity<T> {
 
 	async findByIdAndDelete() {
 		return this.entity_stub;
+	}
+
+	async updateMany() {
+		return {
+			modifiedCount: 1,
+			matchedCount: 1,
+		} as UpdateWriteOpResult;
 	}
 
 	populate() {

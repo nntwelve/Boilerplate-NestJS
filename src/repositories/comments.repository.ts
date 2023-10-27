@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 
 // INNER
 import {
@@ -66,6 +66,7 @@ export class CommentRepository
 				deleted_at: new Date(),
 			},
 		);
+
 		return reponse.modifiedCount !== 0;
 	}
 }

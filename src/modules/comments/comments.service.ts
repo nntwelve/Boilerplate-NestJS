@@ -28,6 +28,9 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 			create_comment_dto.comment_type === COMMENT_TYPE.FLASH_CARD
 				? await this.flash_cards_service.findOne(create_comment_dto.target_id)
 				: await this.collections_service.findOne(create_comment_dto.target_id);
+		if (!target) {
+			throw new BadRequestException();
+		}
 		let parent_id = null,
 			parent_path = null;
 		if (create_comment_dto.parent_id) {
@@ -51,6 +54,13 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 		filter: { target_id: string },
 		{ offset, limit, sort_type, including_children },
 	) {
+		console.log({
+			skip: offset,
+			limit,
+			sort: {
+				created_at: sort_type,
+			},
+		});
 		const comments_reponse = await this.comments_repository.findAll(
 			{
 				...filter,
@@ -68,6 +78,7 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
 		if (!including_children) {
 			return comments_reponse;
 		}
+		console.log(comments_reponse.items);
 
 		const comments_with_children = await Promise.all(
 			comments_reponse.items.map(async (comment) => ({

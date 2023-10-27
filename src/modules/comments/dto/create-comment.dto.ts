@@ -19,7 +19,7 @@ export class CreateCommentDto {
 	comment_type: COMMENT_TYPE;
 
 	@IsOptional()
-	parent_id: string | null;
+	parent_id?: string | null;
 
 	@IsNotEmpty()
 	@MinLength(1)
@@ -28,5 +28,5 @@ export class CreateCommentDto {
 
 	created_by: User | string | ObjectId;
 
-	parent_path: string;
+	parent_path?: string;
 }
