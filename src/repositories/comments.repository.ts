@@ -32,7 +32,8 @@ export class CommentRepository
 		created_comment.current_path = `${dto.parent_path || ','}${
 			created_comment._id
 		},`;
-		return await created_comment.save();
+		await created_comment.save();
+		return created_comment;
 	}
 
 	async getAllSubComments(

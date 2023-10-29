@@ -1,7 +1,6 @@
-import { FilterQuery, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-import * as mongoose from 'mongoose';
 
 // INNER
 import { CommentEntity } from './supports/comment.entity';
@@ -13,12 +12,13 @@ import {
 import { createCommentStub } from '@modules/comments/test/stubs/comment.stub';
 
 // OUTER
-import { SORT_TYPE } from 'src/types/common.type';
-import { get_all_options } from 'src/shared/test/common';
+import { CreateCommentDto } from '@modules/comments/dto/create-comment.dto';
+import { createUserStub } from '@modules/users/test/stubs/user.stub';
 
 describe('CommentsRepository', () => {
 	let repository: CommentRepository;
 	let model: Model<CommentDocument>;
+	const comment_stub = createCommentStub();
 
 	beforeEach(async () => {
 		const module_ref = await Test.createTestingModule({
@@ -36,12 +36,35 @@ describe('CommentsRepository', () => {
 
 	afterEach(() => jest.clearAllMocks());
 
+	describe('create', () => {
+		it('should create current_path based on parent_path', async () => {
+			// Arrange
+			const create_dto: CreateCommentDto = {
+				comment_type: comment_stub.comment_type,
+				content: 'Comment 1.1.1',
+				created_by: createUserStub()._id,
+				target_id: comment_stub.target_id as unknown as string,
+				parent_path: comment_stub.current_path,
+			};
+			jest.spyOn(model, 'create').mockResolvedValueOnce({
+				save: jest.fn(),
+				_id: '63822626721637cbf8efc416',
+			} as any);
+			// Act
+			const created_comment = await repository.create(create_dto);
+			// Assert
+			expect(created_comment.current_path).toBe(
+				`${comment_stub.current_path}63822626721637cbf8efc416,`,
+			);
+			expect(created_comment.save).toBeCalled();
+		});
+	});
+
 	describe('getAllSubComments', () => {
 		it('should be return all replies with n deep level', async () => {
 			// Arrange
-			const comment_sub = createCommentStub();
 			const filter = {
-				target_id: comment_sub.target_id as any,
+				target_id: comment_stub.target_id as any,
 				parent_id: null,
 			};
 			const deep_level = 3; // n deep level
@@ -61,7 +84,9 @@ describe('CommentsRepository', () => {
 				},
 			});
 		});
+	});
 
+	describe('deleteCommentAndReplies', () => {
 		it('should be remove current comment and all replies', async () => {
 			// Arrange
 			const comment_stub = createCommentStub();
