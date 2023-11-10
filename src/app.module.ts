@@ -14,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './exception-filters/global-exception.filter';
 import { BullModule } from '@nestjs/bullmq';
+import { ParagraphsModule } from '@modules/paragraphs/paragraphs.module';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -60,6 +61,7 @@ import { BullModule } from '@nestjs/bullmq';
 				},
 			}),
 		}),
+		ParagraphsModule,
 	],
 	controllers: [AppController],
 	providers: [
