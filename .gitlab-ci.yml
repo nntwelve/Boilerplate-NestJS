@@ -1,0 +1,21 @@
+.docker-build-api:
+  image: docker:latest
+  stage: build
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:api-$CI_COMMIT_REF_NAME
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+
+build-tag-api:
+  extends:
+    - .docker-build-api
+  script:
+    - docker build --build-arg NODE_ENV=production -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  only:
+    - tags
