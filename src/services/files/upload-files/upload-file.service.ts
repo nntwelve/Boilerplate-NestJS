@@ -12,7 +12,7 @@ export class UploadFileToLocalServer implements UploadFileServiceAbstract {
 		{ file, file_name }: { file: Express.Multer.File; file_name: string },
 	) {
 		await fs.writeFile(
-			path.join(__dirname, `../../../../src/files/${file_path}/${file_name}`),
+			path.join(__dirname, `../../../../files/${file_path}/${file_name}`),
 			file.buffer,
 			{
 				encoding: 'utf8',
