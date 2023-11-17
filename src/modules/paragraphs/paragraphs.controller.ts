@@ -16,13 +16,23 @@ import {
 } from '@nestjs/common';
 import { ParagraphsService } from './paragraphs.service';
 import { CreateParagraphDto } from './dto/create-paragraph.dto';
-import { UpdateParagraphDto } from './dto/update-paragraph.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import {
+	AddHighlightContentParagraphDto,
+	UpdateParagraphDto,
+} from './dto/update-paragraph.dto';
+import {
+	ApiBearerAuth,
+	ApiBody,
+	ApiConsumes,
+	ApiOperation,
+	ApiTags,
+} from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { CreateSentencesDto } from './dto/create-sentence.dto';
 import { SwaggerArrayConversion } from 'src/interceptors/swagger-array-conversion.interceptor';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { RequestWithUser } from 'src/types/requests.type';
+import { ParseMongoIdPipe } from 'src/pipes/parse-mongo-id.pipe';
 
 @Controller('paragraphs')
 @ApiTags('paragraphs')
@@ -33,7 +43,7 @@ export class ParagraphsController {
 	@ApiBearerAuth('token')
 	@UseGuards(JwtAccessTokenGuard)
 	@ApiConsumes('multipart/form-data')
-	@UseInterceptors(new SwaggerArrayConversion('sentences'))
+	// @UseInterceptors(new SwaggerArrayConversion('sentences'))
 	@UseInterceptors(AnyFilesInterceptor())
 	@ApiBody({
 		schema: {
@@ -58,23 +68,23 @@ export class ParagraphsController {
 					default:
 						'aɪ lʌv kloʊðz aɪ θɪŋk ˈpiː.pəl baɪ ðem fɔːr ˈdɪf.ɚ.ənt ˈriːzənz laɪk tə lʊk ɡʊd fiːl ˈkɑːn.fə.dənt ɔːr ɪkˈspres ðer staɪl. ˈwer.ɪŋ ˈsɝː.t(ə)n kloʊðz kæn meɪk ʌs fiːl laɪk ə ˈdɪf.ɚ.ənt ˈpɝː.sən ɔːr ɡɪv ʌs ˈkɑːn.fə.dəns. aɪ θɪŋk kloʊðz kæn ˈɑːl.soʊ help dɪˈfaɪn huː wiː ɑːr. sʌm ˈpiː.pəl laɪk ˈwer.ɪŋ --- bɪˈkəz ɪt meɪks ðem fiːl laɪk ðer pɑːrt əv ə ˈsɝː.t(ə)n ɡruːp ɔːr ˈlaɪf.staɪl',
 				},
-				'sentences[]': {
-					type: 'array',
-					items: {
-						type: 'object',
-						default: '',
-					},
-					default: [
-						{
-							content:
-								'I love clothes! I think people buy them for different reasons, like to look good, feel confident, or express their style.',
-							meaning:
-								'Tôi yêu quần áo! Tôi nghĩ mọi người mua chúng vì những lý do khác nhau, thích trông đẹp hơn, cảm thấy tự tin hoặc thể hiện phong cách của họ.',
-							pronunciation:
-								'aɪ lʌv kloʊðz aɪ θɪŋk ˈpiː.pəl baɪ ðem fɔːr ˈdɪf.ɚ.ənt ˈriːzənz laɪk tə lʊk ɡʊd fiːl ˈkɑːn.fə.dənt ɔːr ɪkˈspres ðer staɪl',
-						} as CreateSentencesDto,
-					],
-				},
+				// 'sentences[]': {
+				// 	type: 'array',
+				// 	items: {
+				// 		type: 'object',
+				// 		default: '',
+				// 	},
+				// 	default: [
+				// 		{
+				// 			content:
+				// 				'I love clothes! I think people buy them for different reasons, like to look good, feel confident, or express their style.',
+				// 			meaning:
+				// 				'Tôi yêu quần áo! Tôi nghĩ mọi người mua chúng vì những lý do khác nhau, thích trông đẹp hơn, cảm thấy tự tin hoặc thể hiện phong cách của họ.',
+				// 			pronunciation:
+				// 				'aɪ lʌv kloʊðz aɪ θɪŋk ˈpiː.pəl baɪ ðem fɔːr ˈdɪf.ɚ.ənt ˈriːzənz laɪk tə lʊk ɡʊd fiːl ˈkɑːn.fə.dənt ɔːr ɪkˈspres ðer staɪl',
+				// 		} as CreateSentencesDto,
+				// 	],
+				// },
 				image: {
 					type: 'string',
 					format: 'binary',
@@ -119,12 +129,66 @@ export class ParagraphsController {
 		return this.paragraphs_service.findOne(+id);
 	}
 
-	@Patch(':id')
+	@Post(':id/highlight')
+	@ApiOperation({
+		summary: 'Add highlight content to paragraph',
+	})
+	@ApiBearerAuth('token')
+	@UseGuards(JwtAccessTokenGuard)
+	@ApiConsumes('multipart/form-data')
+	@UseInterceptors(AnyFilesInterceptor())
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				content: {
+					type: 'string',
+					default: 'Define who we are',
+				},
+				meaning: {
+					type: 'string',
+					default: 'Khẳng định bản thân',
+				},
+				pronunciation: {
+					type: 'string',
+					default: 'dɪˈfaɪn huː wiː ɑː',
+				},
+				image: {
+					type: 'string',
+					format: 'binary',
+				},
+				sound: {
+					type: 'string',
+					format: 'binary',
+				},
+				flash_card: {
+					type: 'string',
+				},
+			},
+			required: ['content', 'meaning'],
+		},
+	})
 	update(
-		@Param('id') id: string,
-		@Body() update_paragraph_dto: UpdateParagraphDto,
+		@Req() req: RequestWithUser,
+		@Param('id', ParseMongoIdPipe) id: string,
+		@Body() add_highlight_dto: AddHighlightContentParagraphDto,
+		@UploadedFiles(
+			new ParseFilePipe({
+				validators: [
+					new MaxFileSizeValidator({ maxSize: 8 * 1048576 }), // 30MB (measured in bytes)
+					new FileTypeValidator({
+						fileType: /(image\/(jpg|jpeg|png|heic))|(audio\/(mp3|mpeg))$/,
+					}),
+				],
+			}),
+		)
+		files: Array<Express.Multer.File>,
 	) {
-		return this.paragraphs_service.update(+id, update_paragraph_dto);
+		return this.paragraphs_service.update(
+			req.user,
+			{ ...add_highlight_dto, id },
+			files,
+		);
 	}
 
 	@Delete(':id')

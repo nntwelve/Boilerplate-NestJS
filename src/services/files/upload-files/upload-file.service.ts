@@ -21,6 +21,6 @@ export class UploadFileToLocalServer implements UploadFileServiceAbstract {
 			},
 		);
 
-		return `${this.config_service.get('FILE_PATH')}/${file_path}/${file_name}`;
+		return `/${file_path}/${file_name}`;
 	}
 }

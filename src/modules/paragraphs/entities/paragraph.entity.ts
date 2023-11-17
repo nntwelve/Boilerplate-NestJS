@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 
 // INNER
 import { Sentence, SentenceSchema } from './sentence.entity';
+import { HighLight, HighLightSchema } from './highlight.entity';
 
 // OUTER
 import { Collection } from '@modules/collections/entities/collection.entity';
@@ -42,6 +43,10 @@ export class Paragraph extends BaseEntity {
 	@Prop({ type: [{ type: SentenceSchema }] })
 	@Type(() => Sentence)
 	sentences: Sentence[];
+
+	@Prop({ type: [{ type: HighLightSchema }] })
+	@Type(() => HighLight)
+	highlight: HighLight[];
 
 	@Prop({ default: false })
 	is_public: boolean;

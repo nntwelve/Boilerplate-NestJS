@@ -4,10 +4,8 @@ import { BaseEntity } from '@modules/shared/base/base.entity';
 
 export type SentenceDocument = mongoose.HydratedDocument<Sentence>;
 
-@Schema({
-	collection: 'sentence',
-})
-export class Sentence extends BaseEntity {
+@Schema()
+export class Sentence {
 	@Prop({ required: true })
 	content: string;
 
