@@ -180,6 +180,7 @@ export class ParagraphsController {
 						fileType: /(image\/(jpg|jpeg|png|heic))|(audio\/(mp3|mpeg))$/,
 					}),
 				],
+				fileIsRequired: false,
 			}),
 		)
 		files: Array<Express.Multer.File>,
