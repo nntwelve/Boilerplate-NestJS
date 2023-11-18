@@ -85,6 +85,11 @@ export class ParagraphsController {
 				// 		} as CreateSentencesDto,
 				// 	],
 				// },
+				reference_link: {
+					type: 'string',
+					default:
+						'https://www.youtube.com/watch?v=RZQKle7mpu4&list=PLaG_Jgg6K_D4JZ1x20CC3o3uumValouIG&index=25',
+				},
 				image: {
 					type: 'string',
 					format: 'binary',

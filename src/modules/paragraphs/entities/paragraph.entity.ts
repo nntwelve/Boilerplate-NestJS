@@ -34,6 +34,9 @@ export class Paragraph extends BaseEntity {
 	@Prop()
 	sound: string;
 
+	@Prop()
+	reference_link: string;
+
 	@Prop({ required: true })
 	meaning: string;
 

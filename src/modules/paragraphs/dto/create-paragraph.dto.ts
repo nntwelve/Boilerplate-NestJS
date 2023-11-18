@@ -7,9 +7,11 @@ import {
 	IsBoolean,
 	IsNotEmpty,
 	IsOptional,
+	IsUrl,
 	MaxLength,
 	MinLength,
 	ValidateNested,
+	isURL,
 } from 'class-validator';
 import { Sentence } from '../entities/sentence.entity';
 import { User } from '@modules/users/entities/user.entity';
@@ -64,4 +66,8 @@ export class CreateParagraphDto {
 
 	@IsOptional()
 	collections?: string;
+
+	@IsOptional()
+	@IsUrl()
+	reference_link: string;
 }
