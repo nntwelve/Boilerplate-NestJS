@@ -24,7 +24,7 @@ export class ParagraphsService {
 		const detach_files = this.detachImageAndSound(files);
 		const sound_url = await this.upload_files_service.uploadFile('sound', {
 			file: detach_files.sound_file,
-			file_name: `${create_paragraph_dto.title}.${
+			file_name: `${create_paragraph_dto.title.split(' ').join('_')}.${
 				detach_files.sound_file.originalname.split('.')[1]
 			}`,
 		});

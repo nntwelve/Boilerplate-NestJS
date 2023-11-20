@@ -5,6 +5,11 @@ import * as mongoose from 'mongoose';
 
 export type HighLightDocument = mongoose.HydratedDocument<HighLight>;
 
+export enum HIGHLIGHT_TYPE {
+	NEW_VOCABULARY = 'new_vocabulary',
+	NEW_SENTENCE = 'new_sentence',
+	NEED_HIGHLIGHT = 'need_highlight',
+}
 @Schema()
 export class HighLight {
 	@Prop({ required: true })
@@ -18,6 +23,9 @@ export class HighLight {
 
 	@Prop({ required: true })
 	meaning: string;
+
+	@Prop({ default: HIGHLIGHT_TYPE.NEW_VOCABULARY })
+	type: HIGHLIGHT_TYPE;
 
 	@Prop()
 	example?: string;
