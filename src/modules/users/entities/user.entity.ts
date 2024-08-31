@@ -118,10 +118,8 @@ export class User extends BaseEntity {
 	username: string;
 
 	@Exclude()
-	@Prop({
-		required: true,
-	})
-	password: string;
+	@Prop()
+	password?: string;
 
 	@Prop({
 		default:
@@ -136,6 +134,9 @@ export class User extends BaseEntity {
 		enum: GENDER,
 	})
 	gender: GENDER;
+
+	@Prop({ default: false })
+	is_registered_with_google?: boolean;
 
 	@Prop({ default: 0 })
 	point?: number;

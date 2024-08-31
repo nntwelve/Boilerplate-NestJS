@@ -14,6 +14,7 @@ async function bootstrap() {
 	configSwagger(app);
 	const config_service = app.get(ConfigService);
 	app.useStaticAssets(join(__dirname, './served'));
+	app.enableCors({ origin: '*' });
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,

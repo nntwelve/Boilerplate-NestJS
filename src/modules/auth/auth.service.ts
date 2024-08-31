@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 
 // INNER
-import { SignUpDto } from './dto/sign-up.dto';
+import { SignUpDto, SignUpGoogleDto } from './dto/sign-up.dto';
 
 // OUTER
 import { User } from '@modules/users/entities/user.entity';
@@ -51,6 +51,40 @@ export class AuthService {
 					10 + Math.random() * (999 - 10),
 				)}`, // Random username
 				password: hashed_password,
+			});
+			const refresh_token = this.generateRefreshToken({
+				user_id: user._id.toString(),
+			});
+			await this.storeRefreshToken(user._id.toString(), refresh_token);
+			return {
+				access_token: this.generateAccessToken({
+					user_id: user._id.toString(),
+				}),
+				refresh_token,
+			};
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async authWithGoogle(sign_up_dto: SignUpGoogleDto) {
+		try {
+			let user = await this.users_service.findOneByCondition({
+				email: sign_up_dto.email,
+			});
+			if (user) {
+				if (!user.is_registered_with_google) {
+					await this.users_service.update(user._id.toString(), {
+						is_registered_with_google: true,
+					});
+				}
+				return await this.signIn(user._id.toString());
+			}
+			user = await this.users_service.create({
+				...sign_up_dto,
+				username: `${sign_up_dto.email.split('@')[0]}${Math.floor(
+					10 + Math.random() * (999 - 10),
+				)}`, // Random username
 			});
 			const refresh_token = this.generateRefreshToken({
 				user_id: user._id.toString(),

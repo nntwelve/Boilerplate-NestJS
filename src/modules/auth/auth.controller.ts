@@ -3,7 +3,8 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local.guard';
 import { RequestWithUser } from 'src/types/requests.type';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
-import { SignUpDto } from './dto/sign-up.dto';
+import { jwtDecode } from 'jwt-decode';
+import { SignUpDto, SignUpGoogleDto } from './dto/sign-up.dto';
 import {
 	ApiBadRequestResponse,
 	ApiBody,
@@ -13,11 +14,23 @@ import {
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { OAuth2Client } from 'google-auth-library';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-	constructor(private readonly auth_service: AuthService) {}
+	oauthGoogleClient: OAuth2Client;
+	constructor(
+		private readonly auth_service: AuthService,
+		private readonly config_service: ConfigService,
+	) {
+		this.oauthGoogleClient = new OAuth2Client(
+			this.config_service.get('GOOGLE_CLIENT_ID'),
+			this.config_service.get('GOOGLE_CLIENT_SECRET'),
+			'postmessage',
+		);
+	}
 
 	@Post('sign-up')
 	@ApiOperation({
@@ -168,6 +181,26 @@ export class AuthController {
 	async signIn(@Req() request: RequestWithUser) {
 		const { user } = request;
 		return await this.auth_service.signIn(user._id.toString());
+	}
+
+	@Post('google')
+	async authWithGoogle(@Body() data: SignUpGoogleDto) {
+		const { tokens } = await this.oauthGoogleClient.getToken(data.code); // exchange code for tokens
+		// Get user info
+		const tokenInfo = jwtDecode<{
+			family_name: string;
+			given_name: string;
+			email: string;
+			picture: string;
+		}>(tokens.id_token);
+		console.log({ tokens, tokenInfo });
+		return this.auth_service.authWithGoogle({
+			first_name: tokenInfo.family_name,
+			last_name: tokenInfo.given_name,
+			email: tokenInfo.email,
+			avatar: tokenInfo.picture,
+			is_registered_with_google: true,
+		});
 	}
 
 	@UseGuards(JwtRefreshTokenGuard)
