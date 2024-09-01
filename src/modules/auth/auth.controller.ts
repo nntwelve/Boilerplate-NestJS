@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local.guard';
 import { RequestWithUser } from 'src/types/requests.type';
@@ -13,6 +13,7 @@ import {
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
+import { GoogleAuthGuard } from './guards/google-oauth.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -170,6 +171,44 @@ export class AuthController {
 		return await this.auth_service.signIn(user._id.toString());
 	}
 
+	@UseGuards(GoogleAuthGuard)
+	@Get('google')
+	@ApiResponse({
+		status: 401,
+		description: 'Unauthorized',
+		content: {
+			'application/json': {
+				example: {
+					statusCode: 400,
+					message: 'Wrong credentials!!',
+					error: 'Bad Request',
+				},
+			},
+		},
+	})
+	async authWithGoogle() {
+		return;
+	}
+
+	@UseGuards(GoogleAuthGuard)
+	@Get('google/callback')
+	@ApiResponse({
+		status: 401,
+		description: 'Unauthorized',
+		content: {
+			'application/json': {
+				example: {
+					statusCode: 400,
+					message: 'Wrong credentials!!',
+					error: 'Bad Request!',
+				},
+			},
+		},
+	})
+	async authWithGoogleCallback(@Req() request: RequestWithUser) {
+		return request.user;
+	}
+
 	@UseGuards(JwtRefreshTokenGuard)
 	@Post('refresh')
 	async refreshAccessToken(@Req() request: RequestWithUser) {
@@ -180,5 +219,12 @@ export class AuthController {
 		return {
 			access_token,
 		};
+	}
+
+	@Get('protected')
+	// @UseGuards(JwtAuthGuard)
+	async protected(@Req() request: RequestWithUser) {
+		const { user } = request;
+		return 'Access protected resource';
 	}
 }

@@ -7,6 +7,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAccessTokenStrategy } from './strategies/jwt-access-token.strategy';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
 	imports: [UsersModule, PassportModule, JwtModule.register({})],
@@ -16,6 +17,7 @@ import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy
 		LocalStrategy,
 		JwtAccessTokenStrategy,
 		JwtRefreshTokenStrategy,
+		GoogleStrategy,
 	],
 })
 export class AuthModule {}
