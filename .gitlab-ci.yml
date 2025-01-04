@@ -1,0 +1,20 @@
+stages: [stage_a, stage_b]
+
+workflow:
+  auto_cancel:
+    on_job_failure: all
+
+job1:
+  stage: stage_a
+  script: sleep 60
+
+job2:
+  stage: stage_a
+  script:
+    - sleep 30
+    - exit 1
+
+job3:
+  stage: stage_b
+  script:
+    - sleep 30
