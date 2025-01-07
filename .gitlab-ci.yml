@@ -3,6 +3,14 @@ stages: [build, test, deploy, stage_a, stage_b]
 workflow:
   auto_cancel:
     on_job_failure: all
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        DEPLOY_VARIABLE: "deploy-production"  # Override globally-defined DEPLOY_VARIABLE
+    - if: $CI_COMMIT_BRANCH =~ /feature/
+      variables:
+        IS_A_FEATURE: "true"                  # Define a new variable.
+    - if: $CI_COMMIT_BRANCH                   # Run the pipeline in other cases
 
 build-job:
   stage: build
@@ -17,12 +25,29 @@ job2:
   stage: stage_a
   script:
     - sleep 30
-    - exit 1
+    # - exit 1
 
 job3:
   stage: stage_b
   script:
     - sleep 30
+
+job4:
+  variables:
+    DEPLOY_VARIABLE: "job1-default-deploy"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:                                   # Override DEPLOY_VARIABLE defined
+        DEPLOY_VARIABLE: "job1-deploy-production"  # at the job level.
+    - when: on_success                             # Run the job in other cases
+  script:
+    - echo "Run script with $DEPLOY_VARIABLE as an argument"
+    - echo "Run another script if $IS_A_FEATURE exists"
+
+job5:
+  script:
+    - echo "Run script with $DEPLOY_VARIABLE as an argument"
+    - echo "Run another script if $IS_A_FEATURE exists"
 
 test-job1:
   stage: test
