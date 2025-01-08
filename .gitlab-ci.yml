@@ -92,6 +92,11 @@ mac:rspec:
   needs: ["mac:build"]
   script: echo "Running rspec on mac..."
 
+mac:after-rspec:
+  stage: test
+  needs: ["mac:rspec"]
+  script: echo "Running rspec on mac..."
+
 production:
   stage: deploy
   script: echo "Running production..."
