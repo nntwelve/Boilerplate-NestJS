@@ -32,16 +32,8 @@ build docker:
     - echo $CI_COMMIT_REF_SLUG # <=== Dùng để in
     - echo $CI_COMMIT_BRANCH # <=== Dùng để in ra tên branch
     - echo $CI_DEFAULT_BRANCH # <=== Dùng để in ra tên branch mặc định
-    - | # <=== Dùng cho các script xuống hàng
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag=""
-        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
-      else
-        tag=":$CI_COMMIT_REF_SLUG"
-        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
-      fi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
-    - docker push "$CI_REGISTRY_IMAGE${tag}"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE$CI_COMMIT_REF_SLUG"
   only:
     - /^deploy\/.*$/
 
