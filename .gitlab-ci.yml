@@ -1,10 +1,15 @@
 stages: [test, build, deploy]
 
+prepare dependencies:
+  stage: .pre
+  image: node:20.9.0
+  script:
+    - npm install
+
 test lint:
   stage: test
   image: node:20.9.0
   script:
-    - npm install
     - npm run lint
     - npm run build
 
@@ -12,7 +17,6 @@ unit test:
   stage: test
   image: node:20.9.0
   script:
-    - npm install
     - npm test auth # <=== Chỉ chạy test cho module auth do các module khác chưa có test
 
 e2e test:
@@ -32,14 +36,62 @@ build docker:
     - echo $CI_COMMIT_REF_SLUG # <=== Dùng để in
     - echo $CI_COMMIT_BRANCH # <=== Dùng để in ra tên branch
     - echo $CI_DEFAULT_BRANCH # <=== Dùng để in ra tên branch mặc định
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - | # <=== Dùng cho các script xuống hàng
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE${tag}"
   only:
     - /^deploy\/.*$/
 
-deploy staging:
-  stage: deploy
+# deploy staging:
+#   stage: deploy
+#   script:
+#     - echo "Deploy to staging server"
+#   only:
+#     - deploy/staging
+
+build-tag:
+  image: docker:git
+  stage: build
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+  services:
+    - docker:dind
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD_VNG" | docker login $CI_REGISTRY_VNG -u "$CI_REGISTRY_USER_VNG" --password-stdin
   script:
-    - echo "Deploy to staging server"
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
   only:
-    - deploy/staging
+    - tags
+
+deploy staging:
+  image: docker:latest
+  stage: deploy
+  timeout: 2h
+  services:
+    - docker:dind
+  before_script:
+    # - apt-get update
+    # - apt install zip
+    # - 'which ssh-agent || ( apt install openssh-client -y )'
+    - 'which ssh-agent || ( apt install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - touch ~/.ssh/known_hosts
+    - ssh-keyscan -v -H $STAGING_SERVER_IP >> ~/.ssh/known_hosts
+    - eval $(ssh-agent -s)
+    - echo "$STAGING_SSH_KEY" | tr -d '\r' | ssh-add -
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >
+      ~/.ssh/config'
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/known_hosts
+  script:
+    - >-
+      $STAGING_SSH_CMD "cd $STAGING_WORK_DIR && docker compose pull && docker compose up -d &&
+      exit"
