@@ -15,11 +15,11 @@ unit test:
     - npm install
     - npm test auth # <=== Chỉ chạy test cho module auth do các module khác chưa có test
 
-integration test:
+e2e test:
   stage: test
   image: node:20.9.0
   script:
-    - echo "Integration test running"
+    - echo "E2E test running"
 
 build docker:
   stage: build
@@ -43,7 +43,7 @@ build docker:
     - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
   only:
-    - deploy/*
+    - /^deploy\/.*$/
 
 deploy staging:
   stage: deploy
