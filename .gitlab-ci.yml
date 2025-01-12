@@ -9,12 +9,16 @@ prepare dependencies:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
+    policy: push
 
 test lint:
   stage: test
   image: node:20.9.0
   cache:
     key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    policy: pull
   script:
     - npm run lint
     - npm run build
@@ -24,6 +28,9 @@ unit test:
   image: node:20.9.0
   cache:
     key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    policy: pull
   script:
     - npm test auth # <=== Chỉ chạy test cho module auth do các module khác chưa có test
 
