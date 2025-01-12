@@ -12,6 +12,7 @@ unit test:
   stage: test
   image: node:20.9.0
   script:
+    - npm install
     - npm test
 
 integration test:
