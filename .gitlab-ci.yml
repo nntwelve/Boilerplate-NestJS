@@ -9,7 +9,7 @@ prepare dependencies:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
-    policy: push
+    # policy: push
 
 test lint:
   stage: test
@@ -18,7 +18,7 @@ test lint:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
-    policy: pull
+    # policy: pull
   script:
     - npm run lint
     - npm run build
@@ -30,7 +30,7 @@ unit test:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
-    policy: pull
+    # policy: pull
   script:
     - npm test auth # <=== Chỉ chạy test cho module auth do các module khác chưa có test
 
@@ -63,6 +63,7 @@ build docker:
     - docker push "$CI_REGISTRY_IMAGE${tag}"
   only:
     - /^deploy\/.*$/
+    - main
 
 # deploy staging:
 #   stage: deploy
