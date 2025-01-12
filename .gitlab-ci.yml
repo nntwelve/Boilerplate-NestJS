@@ -1,18 +1,37 @@
 stages: [test, build, deploy]
 
-test lint:
-  stage: test
+prepare dependencies:
+  stage: .pre
   image: node:20.9.0
   script:
     - npm install
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    # policy: push
+
+test lint:
+  stage: test
+  image: node:20.9.0
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    # policy: pull
+  script:
     - npm run lint
     - npm run build
 
 unit test:
   stage: test
   image: node:20.9.0
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    # policy: pull
   script:
-    - npm install
     - npm test auth # <=== Chỉ chạy test cho module auth do các module khác chưa có test
 
 e2e test:
@@ -32,14 +51,24 @@ build docker:
     - echo $CI_COMMIT_REF_SLUG # <=== Dùng để in
     - echo $CI_COMMIT_BRANCH # <=== Dùng để in ra tên branch
     - echo $CI_DEFAULT_BRANCH # <=== Dùng để in ra tên branch mặc định
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - | # <=== Dùng cho các script xuống hàng
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE${tag}"
   only:
     - /^deploy\/.*$/
+    - main
+    - tags
+# deploy staging:
+#   stage: deploy
+#   script:
+#     - echo "Deploy to staging server"
+#   only:
+#     - deploy/staging
 
-deploy staging:
-  stage: deploy
-  script:
-    - echo "Deploy to staging server"
-  only:
-    - deploy/staging
