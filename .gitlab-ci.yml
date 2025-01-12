@@ -64,7 +64,7 @@ build docker:
   only:
     - /^deploy\/.*$/
     - main
-
+    - tags
 # deploy staging:
 #   stage: deploy
 #   script:
@@ -72,17 +72,3 @@ build docker:
 #   only:
 #     - deploy/staging
 
-build-tag:
-  image: docker:git
-  stage: build
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
-  services:
-    - docker:dind
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD_VNG" | docker login $CI_REGISTRY_VNG -u "$CI_REGISTRY_USER_VNG" --password-stdin
-  script:
-    - docker build -t $IMAGE_TAG .
-    - docker push $IMAGE_TAG
-  only:
-    - tags
