@@ -6,7 +6,6 @@ import {
 	IsEnum,
 	IsNotEmpty,
 	IsOptional,
-	IsPhoneNumber,
 	IsStrongPassword,
 	MaxLength,
 	ValidateNested,

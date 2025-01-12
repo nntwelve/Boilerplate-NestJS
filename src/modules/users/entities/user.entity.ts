@@ -1,12 +1,16 @@
 import { BaseEntity } from '@modules/shared/base/base.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Model } from 'mongoose';
-import { Address, AddressSchema } from './address.entity';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { UserRole } from '@modules/user-roles/entities/user-role.entity';
 import { NextFunction } from 'express';
+
+// OUTER
+import { UserRole } from '@modules/user-roles/entities/user-role.entity';
 import { FlashCardDocument } from '@modules/flash-cards/entities/flash-card.entity';
 import { CollectionDocument } from '@modules/collections/entities/collection.entity';
+
+// INNER
+import { Address, AddressSchema } from './address.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -34,8 +38,37 @@ export enum LANGUAGES {
 	},
 })
 export class User extends BaseEntity {
+	constructor({
+		first_name,
+		last_name,
+		email,
+		username,
+		password,
+		role,
+		gender,
+		phone_number,
+	}: {
+		first_name?: string;
+		last_name?: string;
+		email?: string;
+		username?: string;
+		password?: string;
+		role?: mongoose.Types.ObjectId;
+		gender?: GENDER;
+		phone_number?: string;
+	}) {
+		super();
+		this.first_name = first_name;
+		this.last_name = last_name;
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.role = role;
+		this.gender = gender;
+		this.phone_number = phone_number;
+	}
 	@Prop()
-	friendly_id: number;
+	friendly_id?: number;
 
 	@Prop({
 		required: true,
@@ -69,7 +102,7 @@ export class User extends BaseEntity {
 		type: [String],
 		enum: LANGUAGES,
 	})
-	interested_languages: LANGUAGES[];
+	interested_languages?: LANGUAGES[];
 
 	@Prop({
 		match: /^([+]\d{2})?\d{10}$/,
@@ -81,7 +114,7 @@ export class User extends BaseEntity {
 			return `***-***-${last_four_digits}`;
 		},
 	})
-	phone_number: string;
+	phone_number?: string;
 
 	@Prop({
 		required: true,
@@ -99,10 +132,10 @@ export class User extends BaseEntity {
 		default:
 			'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png',
 	})
-	avatar: string;
+	avatar?: string;
 
 	@Prop()
-	date_of_birth: Date;
+	date_of_birth?: Date;
 
 	@Prop({
 		enum: GENDER,
@@ -110,18 +143,19 @@ export class User extends BaseEntity {
 	gender: GENDER;
 
 	@Prop({ default: 0 })
-	point: number;
+	point?: number;
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: UserRole.name,
+		required: true,
 	})
 	@Type(() => UserRole)
 	@Transform((value) => value.obj.role?.name, { toClassOnly: true })
-	role: UserRole;
+	role: UserRole | mongoose.Types.ObjectId;
 
 	@Prop()
-	headline: string;
+	headline?: string;
 
 	@Prop({
 		type: [
@@ -131,19 +165,19 @@ export class User extends BaseEntity {
 		],
 	})
 	@Type(() => Address)
-	address: Address[];
+	address?: Address[];
 
 	@Prop({
 		default: 'cus_mock_id',
 	})
 	@Exclude()
-	stripe_customer_id: string;
+	stripe_customer_id?: string;
 
 	default_address?: string;
 
 	@Prop()
 	@Exclude()
-	current_refresh_token: string;
+	current_refresh_token?: string;
 
 	@Expose({ name: 'full_name' })
 	get fullName(): string {

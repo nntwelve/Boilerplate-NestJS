@@ -7,11 +7,7 @@ export interface Write<T> {
 }
 
 export interface Read<T> {
-	findAll(
-		filter?: object,
-		projection?: string | object,
-		options?: object,
-	): Promise<FindAllResponse<T>>;
+	findAll(filter?: object, options?: object): Promise<FindAllResponse<T>>;
 	findOne(id: string): Promise<T>;
 	findOneByCondition(filter: Partial<T>): Promise<T>;
 }
