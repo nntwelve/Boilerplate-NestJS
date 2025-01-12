@@ -2,6 +2,7 @@ stages: [test, build, deploy]
 
 test lint:
   stage: test
+  image: node:20.9.0
   script:
     - npm install
     - npm run lint
@@ -9,11 +10,13 @@ test lint:
 
 unit test:
   stage: test
+  image: node:20.9.0
   script:
     - npm test
 
 integration test:
   stage: test
+  image: node:20.9.0
   script:
     - echo "Integration test running"
 
