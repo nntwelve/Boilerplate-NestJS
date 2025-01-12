@@ -6,16 +6,17 @@ prepare dependencies:
   script:
     - npm install
   cache:
-    key:
-      files:
-        - package-lock.json
-        - package.json
+    key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
 
 test lint:
   stage: test
   image: node:20.9.0
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
   script:
     - npm run lint
     - npm run build
@@ -23,6 +24,10 @@ test lint:
 unit test:
   stage: test
   image: node:20.9.0
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
   script:
     - npm test auth # <=== Chỉ chạy test cho module auth do các module khác chưa có test
 
