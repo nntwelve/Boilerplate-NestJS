@@ -5,6 +5,13 @@ prepare dependencies:
   image: node:20.9.0
   script:
     - npm install
+  cache:
+    key:
+      files:
+        - package-lock.json
+        - package.json
+    paths:
+      - node_modules/
 
 test lint:
   stage: test
@@ -70,28 +77,3 @@ build-tag:
     - docker push $IMAGE_TAG
   only:
     - tags
-
-deploy staging:
-  image: docker:latest
-  stage: deploy
-  timeout: 2h
-  services:
-    - docker:dind
-  before_script:
-    # - apt-get update
-    # - apt install zip
-    # - 'which ssh-agent || ( apt install openssh-client -y )'
-    - 'which ssh-agent || ( apt install openssh-client -y )'
-    - mkdir -p ~/.ssh
-    - touch ~/.ssh/known_hosts
-    - ssh-keyscan -v -H $STAGING_SERVER_IP >> ~/.ssh/known_hosts
-    - eval $(ssh-agent -s)
-    - echo "$STAGING_SSH_KEY" | tr -d '\r' | ssh-add -
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >
-      ~/.ssh/config'
-    - chmod 700 ~/.ssh
-    - chmod 600 ~/.ssh/known_hosts
-  script:
-    - >-
-      $STAGING_SSH_CMD "cd $STAGING_WORK_DIR && docker compose pull && docker compose up -d &&
-      exit"
