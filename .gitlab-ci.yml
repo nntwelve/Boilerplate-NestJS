@@ -42,6 +42,8 @@ build docker:
       fi
     - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
+  only:
+    - deploy/*
 
 deploy staging:
   stage: deploy
