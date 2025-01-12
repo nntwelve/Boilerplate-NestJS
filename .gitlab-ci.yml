@@ -74,9 +74,9 @@ linux:build:
   stage: build
   script: echo "Building linux..."
 
-mac:build:
-  stage: build
-  script: echo "Building mac..."
+# mac:build:
+#   stage: build
+#   script: echo "Building mac..."
 
 lint:
   stage: test
@@ -88,15 +88,15 @@ linux:rspec:
   needs: ["linux:build"]
   script: echo "Running rspec on linux..."
 
-mac:rspec:
-  stage: test
-  needs: ["mac:build"]
-  script: echo "Running rspec on mac..."
+# mac:rspec:
+#   stage: test
+#   needs: ["mac:build"]
+#   script: echo "Running rspec on mac..."
 
-mac:after-rspec:
-  stage: test
-  needs: ["mac:rspec"]
-  script: echo "Running rspec on mac..."
+# mac:after-rspec:
+#   stage: test
+#   needs: ["mac:rspec"]
+#   script: echo "Running rspec on mac..."
 
 production:
   stage: deploy
@@ -108,6 +108,7 @@ release_job:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
     - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
+      when: manual
   script:
     - echo "Running the release job."
   release:
