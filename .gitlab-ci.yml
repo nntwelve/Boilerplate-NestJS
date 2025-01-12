@@ -32,8 +32,8 @@ build docker:
     - echo $CI_COMMIT_REF_SLUG # <=== Dùng để in
     - echo $CI_COMMIT_BRANCH # <=== Dùng để in ra tên branch
     - echo $CI_DEFAULT_BRANCH # <=== Dùng để in ra tên branch mặc định
-    - docker build --pull -t "$CI_REGISTRY_IMAGE$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE$CI_COMMIT_REF_SLUG"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   only:
     - /^deploy\/.*$/
 
