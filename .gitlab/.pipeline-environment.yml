@@ -1,0 +1,26 @@
+.staging:
+  variables:
+    SERVER_IP: STAGING_SERVER_IP
+    SSH_KEY: STAGING_SSH_KEY
+    SSH_CMD: STAGING_SSH_CMD
+    WORK_DIR: STAGING_WORK_DIR
+  script:
+    - echo "Running default staging script"
+
+.uat:
+  variables:
+    SERVER_IP: UAT_SERVER_IP
+    SSH_KEY: UAT_SSH_KEY
+    SSH_CMD: UAT_SSH_CMD
+    WORK_DIR: UAT_WORK_DIR
+  script:
+    - echo "Running default uat script"
+
+.prod:
+  variables:
+    SERVER_IP: UAT_SERVER_IP
+    SSH_KEY: UAT_SSH_KEY
+    SSH_CMD: UAT_SSH_CMD
+    WORK_DIR: UAT_WORK_DIR
+  script:
+    - echo "Running default prod script"

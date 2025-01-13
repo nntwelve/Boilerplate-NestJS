@@ -1,5 +1,6 @@
 include:
   - local: .gitlab/.pipeline-template.yml
+  - local: .gitlab/.pipeline-environment.yml
 
 stages: [test, build, deploy]
 
@@ -77,16 +78,8 @@ build docker:
 
 deploy staging:
   extends: .deploy
-  variables:
-    SERVER_IP: STAGING_SERVER_IP
-    SSH_KEY: STAGING_SSH_KEY
-    SSH_CMD: STAGING_SSH_CMD
-    WORK_DIR: STAGING_WORK_DIR
+  variables: !reference [.staging, variables]
 
 deploy uat:
   extends: .deploy
-  variables:
-    SERVER_IP: UAT_SERVER_IP
-    SSH_KEY: UAT_SSH_KEY
-    SSH_CMD: UAT_SSH_CMD
-    WORK_DIR: UAT_WORK_DIR
+  variables: !reference [.uat, variables]
