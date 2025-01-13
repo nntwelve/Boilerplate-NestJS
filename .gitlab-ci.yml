@@ -72,3 +72,42 @@ build docker:
 #   only:
 #     - deploy/staging
 
+.deploy:
+  image: docker:latest
+  stage: deploy
+  timeout: 2h
+  services:
+    - docker:dind
+  before_script:
+    # - "which ssh-agent || ( apt install openssh-client -y )"
+    # - mkdir -p ~/.ssh
+    # - touch ~/.ssh/known_hosts
+    # - ssh-keyscan -v -H $SERVER_IP >> ~/.ssh/known_hosts
+    # - eval $(ssh-agent -s)
+    # - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+    # - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >
+    #   ~/.ssh/config'
+    # - chmod 700 ~/.ssh
+    # - chmod 600 ~/.ssh/known_hosts
+    - echo "BEFORE SCRIPT $SSH_KEY, $SERVER_IP, $SSH_CMD, $WORK_DIR"
+  script:
+    # - >-
+    #   $SSH_CMD "cd $WORK_DIR && docker compose pull && docker compose up -d &&
+    #   exit"
+    - echo "SCRIPT $SSH_KEY, $SERVER_IP, $SSH_CMD, $WORK_DIR"
+
+deploy staging:
+  extends: .deploy
+  variables:
+    SERVER_IP: STAGING_SERVER_IP
+    SSH_KEY: STAGING_SSH_KEY
+    SSH_CMD: STAGING_SSH_CMD
+    WORK_DIR: STAGING_WORK_DIR
+
+deploy uat:
+  extends: .deploy
+  variables:
+    SERVER_IP: UAT_SERVER_IP
+    SSH_KEY: UAT_SSH_KEY
+    SSH_CMD: UAT_SSH_CMD
+    WORK_DIR: UAT_WORK_DIR
