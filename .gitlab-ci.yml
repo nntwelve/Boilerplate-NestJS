@@ -1,5 +1,5 @@
 include:
-  - template: ./.gitlab/.pipeline-template.yml
+  - local: ./.gitlab/.pipeline-template.yml
 
 stages: [test, build, deploy]
 
