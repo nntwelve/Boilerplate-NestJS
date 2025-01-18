@@ -13,7 +13,7 @@ prepare dependencies:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
-    policy: push
+    # policy: push
 
 test lint:
   stage: test
