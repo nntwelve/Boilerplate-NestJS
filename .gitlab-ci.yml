@@ -62,7 +62,7 @@ build docker:
   script:
     - echo $CI_COMMIT_REF_SLUG # <=== Dùng để in
     - echo $CI_COMMIT_BRANCH # <=== Dùng để in ra tên branch
-    # - echo $CI_DEFAULT_BRANCH # <=== Dùng để in ra tên branch mặc định
+    - echo $CI_DEFAULT_BRANCH # <=== Dùng để in ra tên branch mặc định
     - | # <=== Dùng cho các script xuống hàng
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
         tag=""
@@ -77,6 +77,13 @@ build docker:
     - if: $CI_COMMIT_BRANCH =~ /^deploy\/.*$/
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
+    - changes:
+        - Dockerfile
+        - package-lock.json
+        - package.json
+        - src/**/*
+        - .env
+        - nest-cli.json
 # deploy staging:
 #   stage: deploy
 #   script:
