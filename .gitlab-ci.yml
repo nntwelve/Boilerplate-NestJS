@@ -4,9 +4,14 @@ include:
 
 stages: [test, build, deploy]
 
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
 prepare dependencies:
   stage: .pre
   image: node:20.9.0
+  interruptible: true
   script:
     - npm install
   cache:
@@ -17,6 +22,7 @@ prepare dependencies:
 test lint:
   stage: test
   image: node:20.9.0
+  interruptible: true
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
@@ -29,6 +35,7 @@ test lint:
 unit test:
   stage: test
   image: node:20.9.0
+  interruptible: true
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
@@ -40,12 +47,14 @@ unit test:
 e2e test:
   stage: test
   image: node:20.9.0
+  interruptible: true
   script:
     - echo "E2E test running"
 
 build docker:
   stage: build
   image: docker:git
+  interruptible: true
   services:
     - docker:dind
   before_script:
