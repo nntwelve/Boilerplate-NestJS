@@ -9,6 +9,13 @@
     - echo "Running default staging script"
   rules:
     - if: $CI_COMMIT_BRANCH == $BRANCH_NAME
+      changes:
+        - Dockerfile
+        - package-lock.json
+        - package.json
+        - src/**/*
+        - .env
+        - nest-cli.json
 
 .uat:
   variables:
@@ -21,6 +28,13 @@
     - echo "Running default uat script"
   rules:
     - if: $CI_COMMIT_BRANCH == $BRANCH_NAME
+      changes:
+        - Dockerfile
+        - package-lock.json
+        - package.json
+        - src/**/*
+        - .env
+        - nest-cli.json
 
 .prod:
   variables:
