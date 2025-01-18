@@ -4,8 +4,11 @@
     SSH_KEY: STAGING_SSH_KEY
     SSH_CMD: STAGING_SSH_CMD
     WORK_DIR: STAGING_WORK_DIR
+    BRANCH_NAME: deploy/staging
   script:
     - echo "Running default staging script"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $BRANCH_NAME
 
 .uat:
   variables:
@@ -13,8 +16,11 @@
     SSH_KEY: UAT_SSH_KEY
     SSH_CMD: UAT_SSH_CMD
     WORK_DIR: UAT_WORK_DIR
+    BRANCH_NAME: deploy/uat
   script:
     - echo "Running default uat script"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $BRANCH_NAME
 
 .prod:
   variables:

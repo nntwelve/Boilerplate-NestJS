@@ -79,7 +79,10 @@ build docker:
 deploy staging:
   extends: .deploy
   variables: !reference [.staging, variables]
-
+  rules:
+    - !reference [.staging, rules]
 deploy uat:
   extends: .deploy
   variables: !reference [.uat, variables]
+  rules:
+    - !reference [.staging, rules]
