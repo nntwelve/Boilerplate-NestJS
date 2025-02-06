@@ -98,4 +98,4 @@ deploy uat:
   extends: .deploy
   variables: !reference [.uat, variables]
   rules:
-    - !reference [.staging, rules]
+    - !reference [.uat, rules]
