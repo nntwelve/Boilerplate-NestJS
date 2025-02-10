@@ -6,24 +6,24 @@ import {
 	Patch,
 	Param,
 	Delete,
-	UseGuards,
 	UseInterceptors,
 	UploadedFiles,
 } from '@nestjs/common';
 import { TopicsService } from './topics.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { Public } from 'src/decorators/auth.decorator';
 import MongooseClassSerializerInterceptor from 'src/interceptors/mongoose-class-serializer.interceptor';
 import { Topic } from './entities/topic.entity';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 
 @Controller('topics')
 @ApiTags('topics')
 // @UseGuards(JwtAccessTokenGuard)
 @UseInterceptors(MongooseClassSerializerInterceptor(Topic))
+@UseInterceptors(LoggingInterceptor)
 export class TopicsController {
 	constructor(private readonly topicsService: TopicsService) {}
 

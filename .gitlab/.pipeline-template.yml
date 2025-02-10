@@ -1,0 +1,22 @@
+.deploy:
+  image: docker:latest
+  stage: deploy
+  timeout: 2h
+  services:
+    - docker:dind
+  before_script:
+    - 'which ssh-agent || ( apt install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - touch ~/.ssh/known_hosts
+    - ssh-keyscan -v -H $SERVER_IP >> ~/.ssh/known_hosts
+    - eval $(ssh-agent -s)
+    - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >
+      ~/.ssh/config'
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/known_hosts
+    - echo $CI_REGISTRY_USER $CI_JOB_TOKEN
+  script:
+    - >-
+      $SSH_CMD "docker login registry.gitlab.com -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN && cd $WORK_DIR && docker compose pull && docker compose up -d &&
+      exit"

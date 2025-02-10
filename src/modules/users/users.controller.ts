@@ -10,6 +10,8 @@ import {
 	SerializeOptions,
 	UseGuards,
 	UploadedFiles,
+	Query,
+	ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,11 +22,19 @@ import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import { USER_ROLE } from '@modules/user-roles/entities/user-role.entity';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBearerAuth,
+	ApiBody,
+	ApiConsumes,
+	ApiOperation,
+	ApiTags,
+} from '@nestjs/swagger';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { ApiDocsPagination } from 'src/decorators/swagger-form-data.decorator';
 
 @Controller('users')
 @ApiTags('users')
+@ApiBearerAuth('token')
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UsersController {
 	constructor(private readonly users_service: UsersService) {}
@@ -45,11 +55,15 @@ export class UsersController {
 		excludePrefixes: ['first', 'last'],
 	})
 	@Get()
+	@ApiDocsPagination(User.name)
 	@Roles(USER_ROLE.USER)
 	@UseGuards(RolesGuard)
 	@UseGuards(JwtAccessTokenGuard)
-	findAll() {
-		return this.users_service.findAll();
+	findAll(
+		@Query('offset', ParseIntPipe) offset: number,
+		@Query('limit', ParseIntPipe) limit: number,
+	) {
+		return this.users_service.findAll({}, { offset, limit });
 	}
 
 	@Get(':id')
