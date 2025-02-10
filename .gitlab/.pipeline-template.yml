@@ -15,8 +15,9 @@
       ~/.ssh/config'
     - chmod 700 ~/.ssh
     - chmod 600 ~/.ssh/known_hosts
-    - docker login registry.gitlab.com -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN
+    - echo $CI_REGISTRY_USER $CI_JOB_TOKEN
   script:
+    - docker login registry.gitlab.com -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN
     - >-
       $SSH_CMD "cd $WORK_DIR && docker compose pull && docker compose up -d &&
       exit"
