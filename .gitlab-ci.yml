@@ -82,12 +82,6 @@ build docker:
         - src/**/*
         - .env
         - nest-cli.json
-# deploy staging:
-#   stage: deploy
-#   script:
-#     - echo "Deploy to staging server"
-#   only:
-#     - deploy/staging
 
 deploy staging:
   extends: .deploy

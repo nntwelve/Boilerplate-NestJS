@@ -5,10 +5,10 @@
   services:
     - docker:dind
   before_script:
-    - "which ssh-agent || ( apt install openssh-client -y )"
+    - 'which ssh-agent || ( apt install openssh-client -y )'
     - mkdir -p ~/.ssh
     - touch ~/.ssh/known_hosts
-    - ssh-keyscan -v -p 234 -H $SERVER_IP >> ~/.ssh/known_hosts
+    - ssh-keyscan -v -H $SERVER_IP >> ~/.ssh/known_hosts
     - eval $(ssh-agent -s)
     - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >
