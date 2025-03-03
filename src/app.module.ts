@@ -11,6 +11,8 @@ import { CollectionsModule } from '@modules/collections/collections.module';
 import { UserRolesModule } from '@modules/user-roles/user-roles.module';
 import { TopicsModule } from '@modules/topics/topics.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './exception-filters/global-exception.filter';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -50,6 +52,12 @@ import { AuthModule } from './modules/auth/auth.module';
 		AuthModule,
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [
+		AppService,
+		{
+			provide: APP_FILTER,
+			useClass: GlobalExceptionFilter,
+		},
+	],
 })
 export class AppModule {}

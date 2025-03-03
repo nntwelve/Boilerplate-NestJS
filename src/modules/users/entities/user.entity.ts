@@ -4,13 +4,17 @@ import mongoose, { HydratedDocument, Model } from 'mongoose';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { NextFunction } from 'express';
 
+// INNER
+import { Address, AddressSchema } from './address.entity';
+
 // OUTER
 import { UserRole } from '@modules/user-roles/entities/user-role.entity';
 import { FlashCardDocument } from '@modules/flash-cards/entities/flash-card.entity';
 import { CollectionDocument } from '@modules/collections/entities/collection.entity';
-
-// INNER
-import { Address, AddressSchema } from './address.entity';
+import {
+	CheckInData,
+	CheckInDataSchema,
+} from '@modules/daily-check-in/entities/check-in-data.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -38,16 +42,7 @@ export enum LANGUAGES {
 	},
 })
 export class User extends BaseEntity {
-	constructor({
-		first_name,
-		last_name,
-		email,
-		username,
-		password,
-		role,
-		gender,
-		phone_number,
-	}: {
+	constructor(user: {
 		first_name?: string;
 		last_name?: string;
 		email?: string;
@@ -58,14 +53,14 @@ export class User extends BaseEntity {
 		phone_number?: string;
 	}) {
 		super();
-		this.first_name = first_name;
-		this.last_name = last_name;
-		this.email = email;
-		this.username = username;
-		this.password = password;
-		this.role = role;
-		this.gender = gender;
-		this.phone_number = phone_number;
+		this.first_name = user?.first_name;
+		this.last_name = user?.last_name;
+		this.email = user?.email;
+		this.username = user?.username;
+		this.password = user?.password;
+		this.role = user?.role;
+		this.gender = user?.gender;
+		this.phone_number = user?.phone_number;
 	}
 	@Prop()
 	friendly_id?: number;
@@ -178,6 +173,18 @@ export class User extends BaseEntity {
 	@Prop()
 	@Exclude()
 	current_refresh_token?: string;
+
+	@Prop({
+		type: [CheckInDataSchema],
+	})
+	@Type(() => CheckInData)
+	daily_check_in?: CheckInData[];
+
+	@Prop()
+	last_check_in?: Date;
+
+	@Prop()
+	last_get_check_in_rewards?: Date;
 
 	@Expose({ name: 'full_name' })
 	get fullName(): string {

@@ -9,4 +9,6 @@ export const UsersService = jest.fn().mockReturnValue({
 	create: jest.fn().mockResolvedValue(createUserStub()),
 	update: jest.fn().mockResolvedValue(createUserStub()),
 	remove: jest.fn().mockResolvedValue(true),
+	updateDailyCheckIn: jest.fn().mockResolvedValue(createUserStub()),
+	getCheckInData: jest.fn(),
 });

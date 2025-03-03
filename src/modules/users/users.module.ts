@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule, getModelToken } from '@nestjs/mongoose';
+
+// INNER
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { User, UserSchemaFactory } from './entities/user.entity';
 import { UsersRepository } from '@repositories/users.repository';
+
+// OUTER
 import { UserRolesModule } from '@modules/user-roles/user-roles.module';
 import {
 	FlashCard,
@@ -13,6 +17,7 @@ import {
 	Collection,
 	CollectionSchema,
 } from '@modules/collections/entities/collection.entity';
+import { DailyCheckInModule } from '@modules/daily-check-in/daily-check-in.module';
 
 @Module({
 	imports: [
@@ -30,6 +35,7 @@ import {
 			},
 		]),
 		UserRolesModule,
+		DailyCheckInModule,
 	],
 	controllers: [UsersController],
 	providers: [
