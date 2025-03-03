@@ -147,7 +147,7 @@ export class User extends BaseEntity {
 	})
 	@Type(() => UserRole)
 	@Transform((value) => value.obj.role?.name, { toClassOnly: true })
-	role: UserRole | mongoose.Types.ObjectId;
+	role: UserRole | mongoose.Types.ObjectId | string;
 
 	@Prop()
 	headline?: string;

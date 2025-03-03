@@ -5,6 +5,16 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
 export type FlashCardDocument = mongoose.HydratedDocument<FlashCard>;
+
+export enum FlashCardState {
+	Draft = 'Draft',
+	InReview = 'InReview',
+	ApprovedOne = 'ApprovedOne',
+	RejectedOne = 'RejectedOne',
+	ApprovedTwo = 'ApprovedTwo',
+	RejectedTwo = 'RejectedTwo',
+	Publish = 'Publish',
+}
 @Schema({
 	collection: 'flash-cards',
 })
@@ -29,6 +39,9 @@ export class FlashCard extends BaseEntity {
 
 	@Prop({ default: false })
 	is_public: boolean;
+
+	@Prop({ default: FlashCardState.Draft })
+	state?: FlashCardState;
 
 	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
 	user: User;

@@ -10,6 +10,8 @@ import {
 	UploadedFile,
 	Req,
 	UseGuards,
+	BadRequestException,
+	Query,
 } from '@nestjs/common';
 import { FlashCardsService } from './flash-cards.service';
 import { CreateFlashCardDto } from './dto/create-flash-card.dto';
@@ -19,12 +21,15 @@ import {
 	ApiBody,
 	ApiConsumes,
 	ApiOperation,
+	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RequestWithUser } from 'src/types/requests.type';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { SwaggerArrayConversion } from 'src/interceptors/swagger-array-conversion.interceptor';
+import { ParseMongoIdPipe } from 'src/pipes/parse-mongo-id.pipe';
+import { ERRORS_DICTIONARY } from 'src/constraints/error-dictionary.constraint';
 
 @Controller('flash-cards')
 @ApiTags('flash-cards')
@@ -114,5 +119,56 @@ export class FlashCardsController {
 	@Delete(':id')
 	remove(@Param('id') id: string) {
 		return this.flash_cards_service.remove(id);
+	}
+
+	@Post(':id/sending-review')
+	@ApiBearerAuth('token')
+	@ApiOperation({
+		summary: 'User send review for their flash card',
+	})
+	@UseGuards(JwtAccessTokenGuard)
+	async sendReview(
+		@Req() request: RequestWithUser,
+		@Param('id', ParseMongoIdPipe) id: string,
+	) {
+		const flash_card = await this.flash_cards_service.findOne(id);
+		if (!flash_card) {
+			throw new BadRequestException({
+				message: ERRORS_DICTIONARY.FLASH_CARD_NOT_FOUND,
+				details: 'Flash card not found',
+			});
+		}
+		if (flash_card.user._id.toString() !== request.user._id.toString()) {
+			throw new BadRequestException({
+				message: ERRORS_DICTIONARY.FLASH_CARD_NOT_OWNED,
+				details: 'Flash card not owned',
+			});
+		}
+		return this.flash_cards_service.sendReview(flash_card);
+	}
+
+	@Post(':id/reviewing')
+	@ApiBearerAuth('token')
+	@ApiOperation({
+		summary: 'Admin/leader review user/member flash card',
+	})
+	@ApiQuery({
+		name: 'status',
+		enum: ['approve', 'reject'],
+	})
+	@UseGuards(JwtAccessTokenGuard)
+	async review(
+		@Req() request: RequestWithUser,
+		@Param('id', ParseMongoIdPipe) id: string,
+		@Query('status') status: 'approve' | 'reject',
+	) {
+		const flash_card = await this.flash_cards_service.findOne(id);
+		if (!flash_card) {
+			throw new BadRequestException({
+				message: ERRORS_DICTIONARY.FLASH_CARD_NOT_FOUND,
+				details: 'Flash card not found',
+			});
+		}
+		return this.flash_cards_service.review(request.user, flash_card, status);
 	}
 }
