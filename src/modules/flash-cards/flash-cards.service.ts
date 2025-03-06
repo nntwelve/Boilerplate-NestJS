@@ -4,6 +4,7 @@ import { FlashCard, FlashCardState } from './entities/flash-card.entity';
 import { FlashCardsRepositoryInterface } from './interfaces/flash-cards.interface';
 import { User } from '@modules/users/entities/user.entity';
 import { ERRORS_DICTIONARY } from 'src/constraints/error-dictionary.constraint';
+import { FlashCardContext } from './state-dp/flash-cards.context';
 
 @Injectable()
 export class FlashCardsService extends BaseServiceAbstract<FlashCard> {
@@ -14,16 +15,30 @@ export class FlashCardsService extends BaseServiceAbstract<FlashCard> {
 		super(flash_cards_repository);
 	}
 
-	sendReview(flash_card: FlashCard) {
+	sendReview(user: User, flash_card: FlashCard) {
 		if (flash_card.state !== FlashCardState.Draft) {
 			throw new BadRequestException({
 				message: ERRORS_DICTIONARY.FLASH_CARD_NOT_DRAFT,
 				details: 'Flash card wrong status',
 			});
 		}
+		if (flash_card.user.toString() !== user._id.toString()) {
+			throw new BadRequestException({
+				message: ERRORS_DICTIONARY.FLASH_CARD_NOT_OWNED,
+				details: 'Flash card not owned',
+			});
+		}
 		return this.flash_cards_repository.update(flash_card._id.toString(), {
 			state: FlashCardState.InReview,
 		});
+	}
+
+	sendReviewWithStateDP(user: User, flash_card: FlashCard) {
+		const flash_card_context = new FlashCardContext(
+			flash_card,
+			this.flash_cards_repository,
+		);
+		return flash_card_context.sendReview(user);
 	}
 
 	review(user: User, flash_card: FlashCard, status: 'approve' | 'reject') {
@@ -66,5 +81,17 @@ export class FlashCardsService extends BaseServiceAbstract<FlashCard> {
 		return this.flash_cards_repository.update(flash_card._id.toString(), {
 			state,
 		});
+	}
+
+	reviewWithStateDP(
+		user: User,
+		flash_card: FlashCard,
+		status: 'approve' | 'reject',
+	) {
+		const flash_card_context = new FlashCardContext(
+			flash_card,
+			this.flash_cards_repository,
+		);
+		return flash_card_context.review(user, status);
 	}
 }

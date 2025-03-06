@@ -144,7 +144,10 @@ export class FlashCardsController {
 				details: 'Flash card not owned',
 			});
 		}
-		return this.flash_cards_service.sendReview(flash_card);
+		return this.flash_cards_service.sendReviewWithStateDP(
+			request.user,
+			flash_card,
+		);
 	}
 
 	@Post(':id/reviewing')
@@ -169,6 +172,10 @@ export class FlashCardsController {
 				details: 'Flash card not found',
 			});
 		}
-		return this.flash_cards_service.review(request.user, flash_card, status);
+		return this.flash_cards_service.reviewWithStateDP(
+			request.user,
+			flash_card,
+			status,
+		);
 	}
 }
